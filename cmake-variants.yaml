@@ -1,0 +1,34 @@
+buildType:
+  default: debug
+  description: The build type
+  choices:
+    debug:
+      short: Debug
+      long: emit debug information without performing optimizations
+      buildType: Debug
+    release:
+      short: Release
+      long: Enable optimizations, omit debug info
+      buildType: Release
+    minsize:
+      short: MinSizeRel
+      long: Optimize for smallest binary size
+      buildType: MinSizeRel
+    reldeb:
+      short: RelWithDebInfo
+      long: Perform optimizations AND include debugging information
+      buildType: RelWithDebInfo
+
+useASAN:
+  default: 'yes'
+  choices:
+    'yes':
+      short: ASAN
+      long: ASAN Enabled
+      settings:
+        ENABLE_ASAN: TRUE
+    'no':
+      short: 'No ASAN'
+      long: ASAN Disabled
+      settings:
+        ENABLE_ASAN: FALSE

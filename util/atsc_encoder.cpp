@@ -46,10 +46,6 @@ int main(int argc, char* argv[]) {
         exit(0);
     }
 
-    if (argc != 2) {
-        fprintf(stderr, "Invalid parameters\n");
-        return 0;
-    }
     auto input = unique_freeable_ptr<FILE>();
     if (filename == "-") {
         input = unique_freeable_ptr<FILE>(stdin, [](FILE*){});

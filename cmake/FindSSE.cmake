@@ -114,7 +114,7 @@ FOREACH(__FLAG ${flags})
       CHECK_C_SOURCE_RUNS("${${type}_CODE}" ${lang}_HAS_${type}_${__FLAG_I})
     ENDIF()
     IF(${lang}_HAS_${type}_${__FLAG_I})
-	  SET(${lang}_SSE_DEFINES "${${lang}_SSE_DEFINES};HAVE_${type}")
+	  SET(${lang}_SSE_DEFINES__ "${${lang}_SSE_DEFINES__};HAVE_${type}")
       SET(${lang}_${type}_FOUND TRUE CACHE BOOL "${lang} ${type} support")
       SET(${lang}_${type}_FLAGS "${__FLAG}" CACHE STRING "${lang} ${type} flags")
     ENDIF()
@@ -128,7 +128,7 @@ IF(NOT ${lang}_${type}_FOUND)
   SET(${lang}_${type}_FLAGS "" CACHE STRING "${lang} ${type} flags")
 ENDIF()
 
-MARK_AS_ADVANCED(${lang}_${type}_FOUND ${lang}_${type}_FLAGS)
+MARK_AS_ADVANCED(${lang}_${type}_FOUND ${lang}_${type}_FLAGS ${lang}_SSE_DEFINES)
 
 ENDMACRO()
 
@@ -152,3 +152,5 @@ CHECK_SSE(CXX "AVX2" "   ;-mavx2;/arch:AVX2")
 CHECK_SSE(CXX "FMA" " ;-mfma; ")
 CHECK_SSE(CXX "BMI2" " ;-mbmi2; ")
 
+SET(C_SSE_DEFINES "${C_SSE_DEFINES__}" CACHE STRING "C SSE flags")
+SET(CXX_SSE_DEFINES "${CXX_SSE_DEFINES__}" CACHE STRING "CXX SSE flags")

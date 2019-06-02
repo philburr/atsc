@@ -1,6 +1,5 @@
 #pragma once
 #include <complex>
-#include "util.h"
 
 struct atsc_parameters {
     static constexpr unsigned ATSC_SEGMENTS_PER_FIELD = 313;

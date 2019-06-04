@@ -21,6 +21,7 @@ jobs:
     displayName: 'Checkout submodules'
 
   - bash: |
+      sudo add-apt-repository -y ppa:myriadrf/drivers
       sudo apt-get update
       sudo apt-get install -y libsoapysdr-dev
     displayName: 'Installing dependencies'

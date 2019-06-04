@@ -1,5 +1,8 @@
 ATSC 8VSB Software Defined Modulator
 ====================================
+Build Status
+~~~~~~~~~~~~
+|badge|
 
 Purpose
 ~~~~~~~
@@ -31,3 +34,5 @@ Examples
 - Broadcasting with ATSC metadata. This requires FFmpeg patches that have not yet been merged upstream. They are available at `https://github.com/philburr/FFmpeg` ::
 
     ffmpeg -i test.mkv -c:v mpeg2_vaapi -acodec eac3 -b:a:0 384k -ar 48k -ac 2 -muxrate 19393000 -metadata atsc_name=KOOL -metadata atsc_channel=14.1 -f mpegts - | ./atsc_encoder -
+
+.. |badge| image:: https://dev.azure.com/philburr0146/atsc/_apis/build/status/philburr.atsc?branchName=master

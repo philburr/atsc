@@ -20,7 +20,7 @@ jobs:
   - script: git submodule update --init --recursive
     displayName: 'Checkout submodules'
 
-  - script: apt-get install libsoapysdr-dev
+  - script: sudo apt-get install libsoapysdr-dev
     displayName: 'Installing dependencies'
 
   - bash: |

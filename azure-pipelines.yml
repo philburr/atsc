@@ -20,6 +20,9 @@ jobs:
   - script: git submodule update --init --recursive
     displayName: 'Checkout submodules'
 
+  - script: apt-get install libsoapysdr-dev
+    displayName: 'Installing dependencies'
+
   - bash: |
       which g++-7
       mkdir ./build && cd ./build

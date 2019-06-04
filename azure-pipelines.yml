@@ -17,6 +17,8 @@ jobs:
     displayName: 'Checkout submodules'
 
   - bash: |
+      which g++-7
+      which g++-8
       mkdir ./build && cd ./build
       cmake -DCMAKE_BUILD_TYPE=Release ..
       make -j4

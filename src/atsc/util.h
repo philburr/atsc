@@ -5,6 +5,37 @@
 template<typename T>
 using unique_freeable_ptr = std::unique_ptr<T,std::function<void(T*)>>;
 
+template <typename T, size_t N> struct alignas(32) aligned_array : public std::array<T,N> {
+    aligned_array(const std::array<T,N>& o) : std::array<T,N>(o) {}
+};
+template<typename T> struct array_params;
+template<typename T, size_t N> struct array_params<std::array<T, N>> {
+    using type = T;
+    static constexpr size_t size = N;
+};
+
+template<typename T>
+struct alignas(32) aligned : public std::array<typename array_params<T>::type, array_params<T>::size> {};
+
+namespace std {
+    template<std::size_t I, class T, std::size_t N>
+    struct tuple_element<I, aligned_array<T,N> >
+    {
+        using type = T;
+    };    
+    template<std::size_t I, class T, std::size_t N>
+    struct tuple_element<I, aligned<std::array<T,N>> >
+    {
+        using type = T;
+    };
+    template< class T, size_t N >
+    class tuple_size< aligned_array<T, N> > : public integral_constant<size_t, N>
+    { };
+    template< class T, size_t N >
+    class tuple_size< aligned<std::array<T, N> > > : public integral_constant<size_t, N>
+    { };
+}
+
 namespace detail {
 
 template<typename T>

@@ -17,8 +17,8 @@ struct atsc_parameters {
     static constexpr unsigned ATSC_RESERVED_SYMBOLS = 12;
     static constexpr unsigned ATSC_TRELLIS_ENCODERS = 12;
 
-    using atsc_mpeg2_segment = std::array<uint8_t, ATSC_DATA_SEGMENTS * ATSC_MPEG2_BYTES>;
-    using atsc_segment_data = std::array<uint8_t, ATSC_DATA_PER_FIELD>;
+    using atsc_field_mpeg2 = std::array<uint8_t, ATSC_DATA_SEGMENTS * ATSC_MPEG2_BYTES>;
+    using atsc_field_data = std::array<uint8_t, ATSC_DATA_PER_FIELD>;
 
     using atsc_signal_type = std::complex<float>;
     using atsc_field_signal = std::array<atsc_signal_type, ATSC_SYMBOLS_PER_FIELD>;

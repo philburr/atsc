@@ -1,6 +1,8 @@
 #pragma once
 #include <immintrin.h>
+#include <cstring>
 #include "atsc_parameters.h"
+#include "util.h"
 #include "signal.h"
 
 static std::array<uint8_t, 256> BitReverseTable256 = detail::reverse_table_initializer().table; 

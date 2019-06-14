@@ -11,5 +11,6 @@ endif()
 
 target_compile_features(build_settings INTERFACE cxx_std_17)
 target_link_libraries(build_settings INTERFACE Threads::Threads)
+target_include_directories(build_settings INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_subdirectory(atsc)

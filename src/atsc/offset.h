@@ -1,15 +1,18 @@
 #pragma once
 #include <cmath>
+#include <immintrin.h>
 #include "atsc_parameters.h"
 
 template<typename PARAMETERS>
 struct atsc_offset {
 
+    atsc_offset() : _table(std::make_unique<aligned_array<std::complex<float>, PARAMETERS::ATSC_SYMBOLS_PER_FIELD>>(table)) {}
+
     void process_field(std::complex<float>* field) {
         unsigned items = PARAMETERS::ATSC_SYMBOLS_PER_FIELD / 4;
 
         std::complex<float> *a = field;
-        std::complex<float> *b = table.data();
+        std::complex<float> *b = _table->data();
         std::complex<float> *s = scale.data();
 
         const __m256 e = _mm256_load_ps((float*)s);
@@ -43,6 +46,9 @@ struct atsc_offset {
     }
 
 private:
+    std::unique_ptr<aligned_array<std::complex<float>, PARAMETERS::ATSC_SYMBOLS_PER_FIELD>> _table;
+
+
     struct oscillator_table_generator {
         static constexpr double frequency = 309411.0 - 3000000.0;
         static constexpr double amplitude = 0.9;
@@ -67,6 +73,6 @@ private:
         std::array<std::complex<float>, PARAMETERS::ATSC_SYMBOLS_PER_FIELD> table;
     };
 
-    __attribute__((aligned(32))) std::array<std::complex<float>, 4> scale = oscillator_table_generator().scale;
-    __attribute__((aligned(32))) std::array<std::complex<float>, PARAMETERS::ATSC_SYMBOLS_PER_FIELD> table = oscillator_table_generator().table;
+    static inline std::array<std::complex<float>, 4> scale = oscillator_table_generator().scale;
+    static inline std::array<std::complex<float>, PARAMETERS::ATSC_SYMBOLS_PER_FIELD> table = oscillator_table_generator().table;
 };

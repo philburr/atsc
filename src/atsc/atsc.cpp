@@ -19,10 +19,10 @@ struct atsc_encoder_impl : public atsc_encoder {
             saved_symbols[i] = atsc_symbol_to_signal<atsc_parameters::atsc_signal_type>::xform(0);
         }
         
-        input = std::make_unique<atsc_parameters::atsc_mpeg2_segment>();
-        encoded = std::make_unique<atsc_parameters::atsc_segment_data>();
-        field1 = std::make_unique<atsc_parameters::atsc_segment_data>();
-        field2 = std::make_unique<atsc_parameters::atsc_segment_data>();
+        input = std::make_unique<atsc_parameters::atsc_field_mpeg2>();
+        encoded = std::make_unique<atsc_parameters::atsc_field_data>();
+        field1 = std::make_unique<atsc_parameters::atsc_field_data>();
+        field2 = std::make_unique<atsc_parameters::atsc_field_data>();
 
         out = unique_freeable_ptr<std::complex<float>>((std::complex<float>*)_mm_malloc(sizeof(atsc_parameters::atsc_signal_type) * (atsc_parameters::ATSC_SYMBOLS_PER_FIELD + atsc_parameters::ATSC_SYMBOLS_PER_SEGMENT), 32), _mm_free);
         field_sync.process_segment(out.get() + atsc_parameters::ATSC_SYMBOLS_PER_FIELD);
@@ -43,10 +43,10 @@ struct atsc_encoder_impl : public atsc_encoder {
     atsc_offset<atsc_parameters> offset;
     atsc_rrc_filter<atsc_parameters> filter;
 
-    std::unique_ptr<atsc_parameters::atsc_mpeg2_segment> input;
-    std::unique_ptr<atsc_parameters::atsc_segment_data> encoded;
-    std::unique_ptr<atsc_parameters::atsc_segment_data> field1;
-    std::unique_ptr<atsc_parameters::atsc_segment_data> field2;
+    std::unique_ptr<atsc_parameters::atsc_field_mpeg2> input;
+    std::unique_ptr<atsc_parameters::atsc_field_data> encoded;
+    std::unique_ptr<atsc_parameters::atsc_field_data> field1;
+    std::unique_ptr<atsc_parameters::atsc_field_data> field2;
     unique_freeable_ptr<std::complex<float>> out;
     unique_freeable_ptr<std::complex<float>> filtered;
 

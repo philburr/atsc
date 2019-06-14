@@ -2,6 +2,7 @@
 #include <cmath>
 #include <immintrin.h>
 #include "common/atsc_parameters.h"
+#include "util.h"
 
 template<typename PARAMETERS>
 struct atsc_offset {

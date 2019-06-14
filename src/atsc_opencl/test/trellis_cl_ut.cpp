@@ -1,0 +1,56 @@
+#include "catch2/catch.hpp"
+#include "../opencl.cpp"
+#include "atsc/trellis.h"
+
+TEST_CASE("ATSC Trellis OpenCL", "[trellis,opencl]") {
+
+    atsc_opencl atsc;
+
+    auto data = atsc_parameters::atsc_field_data();
+    for (unsigned i = 0; i < data.size(); i++) {
+        if (i == 0) 
+            data[i] = 0x36;
+        else
+            data[i] = i;
+    }
+
+    auto atsc_data = atsc_parameters::atsc_field_data();
+    auto deinterleaver = trellis_interleaver<atsc_parameters, ATSC_TRELLIS_INPUT_OPENCL>::table;
+    auto interleaver = trellis_deinterleaver<atsc_parameters, ATSC_TRELLIS_INPUT_SOFTWARE>::table;
+
+    for (unsigned i = 0; i < data.size(); i++) {
+        auto index = deinterleaver[i];
+        index = interleaver[index];
+
+        if (i == 0)
+            atsc_data[index] = 0x36;
+        else
+            atsc_data[index] = i;
+    }
+
+    auto valid_data = atsc_parameters::atsc_field_signal();
+
+    auto trellis = atsc_trellis_encoder<atsc_parameters>();
+    trellis.process(valid_data.data(), atsc_data.data());
+
+    auto input = atsc.cl_alloc(data.size());
+    atsc.to_device(input, data.data(), data.size());
+
+    auto output_data = atsc_parameters::atsc_field_signal();
+    auto output = atsc.cl_alloc(output_data.size() * sizeof(atsc_parameters::atsc_signal_type));
+    cl_event event = atsc.trellis(output, input);
+    atsc.to_host(output_data.data(), output, output_data.size() * sizeof(atsc_parameters::atsc_signal_type), event);
+
+    for (size_t i = 0; i < valid_data.size(); i++) {
+        REQUIRE(valid_data[i] == output_data[i]);
+    }
+
+    auto valid_carry = trellis.get_carry();
+    auto carry = atsc.get_carry();
+    for (size_t i = 0; i < 3; i++) {
+        for (size_t j = 0; j < 12; j++) {
+            REQUIRE(valid_carry[i][j] == carry[i][j]);
+        }
+    }
+
+}

@@ -4,10 +4,11 @@ template<typename PARAMETERS>
 struct oscillator_table {
     constexpr oscillator_table() {}
 
-private:
     static constexpr double frequency = 309411.0 - 3000000.0;
     static constexpr double amplitude = 0.9;
     static constexpr double sampling_frequency = 4500000.0 / 286 * 684;
+
+private:
     struct initializer {
 
         initializer() : table() {

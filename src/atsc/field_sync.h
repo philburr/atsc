@@ -1,5 +1,5 @@
 #pragma once
-#include "atsc_parameters.h"
+#include "common/atsc_parameters.h"
 #include "signal.h"
 
 template<unsigned INITIAL_STATE, unsigned SHIFT_OUT, unsigned MASK, unsigned BITS>

@@ -1,9 +1,9 @@
 #pragma once
 #include <cassert>
-#include "atsc_parameters.h"
+#include "common/atsc_parameters.h"
 
 
-template<typename PARAMETERS>
+template<typename PARAMETERS, bool SOFTWARE_DECODE>
 class atsc_interleaver {
 public:
     constexpr atsc_interleaver() {}
@@ -50,20 +50,27 @@ private:
                 }
 
                 // transpose
-                uint32_t group = output / 156;
-                uint32_t row = (output % 156) / 12;
-                uint32_t col = (output + shift) % 12;
-                size_t destination = group * 156 + col * 13 + row;
-                size_t destination2 = output;
+                size_t destination;
+                if (SOFTWARE_DECODE) {
+                    constexpr uint32_t trellis_input_size = 13;
+                    const uint32_t group_size = trellis_input_size * PARAMETERS::ATSC_TRELLIS_ENCODERS; 
+                    uint32_t group = output / group_size;
+                    uint32_t row = (output % group_size) / PARAMETERS::ATSC_TRELLIS_ENCODERS;
+                    uint32_t col = (output + shift) % PARAMETERS::ATSC_TRELLIS_ENCODERS;
+                    destination = group * group_size + col * trellis_input_size + row;
+                } else {
+                    constexpr uint32_t trellis_input_size = PARAMETERS::ATSC_DATA_PER_FIELD / PARAMETERS::ATSC_TRELLIS_ENCODERS;
+                    const uint32_t group_size = trellis_input_size * PARAMETERS::ATSC_TRELLIS_ENCODERS; 
+                    uint32_t group = output / group_size;
+                    uint32_t row = (output % group_size) / PARAMETERS::ATSC_TRELLIS_ENCODERS;
+                    uint32_t col = (output + shift) % PARAMETERS::ATSC_TRELLIS_ENCODERS;
+                    destination = group * group_size + col * trellis_input_size + row;
+                }
 
                 // split into current/next field
                 if (destination >= len) {
                     destination -= len;
                     destination += 65536;
-                }
-                if (destination2 >= len) {
-                    destination2 -= len;
-                    destination2 += 65536;
                 }
 
                 if (line == 0) {

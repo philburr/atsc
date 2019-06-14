@@ -5,6 +5,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/external/catch2/contr
 
 include(CTest)
 include(FindSSE)
+include(CTest)
 find_package(Threads)
 
 add_subdirectory(external)

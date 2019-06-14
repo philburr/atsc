@@ -1,6 +1,7 @@
 #pragma once
 
 #include<cstdint>
+#include "common/bits.h"
 
 template<typename T>
 using unique_freeable_ptr = std::unique_ptr<T,std::function<void(T*)>>;
@@ -37,54 +38,6 @@ namespace std {
 }
 
 namespace detail {
-
-template<typename T>
-struct bit_size {
-    enum { size = 8 * sizeof(T) };
-};
-
-template<size_t N>
-struct bit_container {
-};
-
-template<>
-struct bit_container<8> {
-    using type = uint8_t;
-};
-
-template<>
-struct bit_container<16> {
-    using type = uint16_t;
-};
-
-template<>
-struct bit_container<32> {
-    using type = uint32_t;
-};
-
-template<>
-struct bit_container<64> {
-    using type = uint64_t;
-};
-
-constexpr int round_power_2(uint64_t v) {
-    v--;
-    v |= v >> 1;
-    v |= v >> 2;
-    v |= v >> 4;
-    v |= v >> 8;
-    v |= v >> 16;
-    v |= v >> 32;
-    v++;
-    return (int)v;
-}
-
-template <typename T, unsigned B>
-inline T signextend(const T x)
-{
-  struct {T x:B;} s;
-  return s.x = x;
-}
 
 struct reverse_table_initializer {
     constexpr reverse_table_initializer() : table() {

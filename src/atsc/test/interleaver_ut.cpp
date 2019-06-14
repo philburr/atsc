@@ -4,7 +4,7 @@
 #include <cstring>
 
 void generate_test_data() {
-    atsc_interleaver<atsc_parameters> interleave;
+    atsc_interleaver<atsc_parameters, true> interleave;
 
     auto input = random_vector_data<atsc_parameters::atsc_field_data>();
     auto output1 = std::make_unique<atsc_parameters::atsc_field_data>();
@@ -21,7 +21,7 @@ void generate_test_data() {
 
 TEST_CASE("ATSC Interleaver", "[interleave]") {
 
-    atsc_interleaver<atsc_parameters> interleave;
+    atsc_interleaver<atsc_parameters, true> interleave;
 
     auto input = load_vector_data<atsc_parameters::atsc_field_data>("interleaver_input.data");
     auto output1 = load_vector_data<atsc_parameters::atsc_field_data>("interleaver_output1.data");

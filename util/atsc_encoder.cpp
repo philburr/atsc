@@ -8,7 +8,7 @@
 #include <cxxopts.hpp>
 
 #include "atsc/atsc.h"
-#include "atsc/atsc_parameters.h"
+#include "common/atsc_parameters.h"
 #include "defaults.h"
 
 template<typename T>

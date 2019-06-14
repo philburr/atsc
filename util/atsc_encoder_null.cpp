@@ -5,7 +5,7 @@
 #include <immintrin.h>
 
 #include "atsc/atsc.h"
-#include "atsc/atsc_parameters.h"
+#include "common/atsc_parameters.h"
 
 template<typename T>
 using unique_freeable_ptr = std::unique_ptr<T,std::function<void(T*)>>;

@@ -1,5 +1,6 @@
 #pragma once
 #include <complex>
+#include <array>
 
 struct atsc_parameters {
     static constexpr unsigned ATSC_SEGMENTS_PER_FIELD = 313;
@@ -24,3 +25,5 @@ struct atsc_parameters {
     using atsc_field_signal = std::array<atsc_signal_type, ATSC_SYMBOLS_PER_FIELD>;
 };
 
+static constexpr unsigned ATSC_TRELLIS_INPUT_SOFTWARE = 13;
+static constexpr unsigned ATSC_TRELLIS_INPUT_OPENCL = atsc_parameters::ATSC_DATA_PER_FIELD / atsc_parameters::ATSC_TRELLIS_ENCODERS;

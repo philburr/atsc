@@ -37,7 +37,7 @@ struct atsc_encoder_impl : public atsc_encoder {
     atsc_parameters::atsc_signal_type saved_symbols[atsc_parameters::ATSC_RESERVED_SYMBOLS];
     atsc_randomize<atsc_parameters> randomizer;
     atsc_reed_solomon<atsc_parameters> fec;
-    atsc_interleaver<atsc_parameters> interleaver;
+    atsc_interleaver<atsc_parameters, true> interleaver;
     atsc_trellis_encoder<atsc_parameters> trellis;
     atsc_field_sync<atsc_parameters> field_sync;
     atsc_offset<atsc_parameters> offset;

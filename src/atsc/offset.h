@@ -1,7 +1,7 @@
 #pragma once
 #include <cmath>
 #include <immintrin.h>
-#include "atsc_parameters.h"
+#include "common/atsc_parameters.h"
 
 template<typename PARAMETERS>
 struct atsc_offset {

@@ -1,7 +1,7 @@
 #pragma once
 #include <immintrin.h>
 #include <cstring>
-#include "atsc_parameters.h"
+#include "common/atsc_parameters.h"
 #include "util.h"
 #include "signal.h"
 

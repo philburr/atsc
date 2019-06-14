@@ -1,7 +1,7 @@
 #pragma once
 #include <cassert>
 #include <cstring>
-#include "atsc_parameters.h"
+#include "common/atsc_parameters.h"
 
 template<typename PARAMETERS>
 class atsc_randomize {

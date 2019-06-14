@@ -1,7 +1,7 @@
 #pragma once
 #include <immintrin.h>
 #include <cassert>
-#include "atsc_parameters.h"
+#include "common/atsc_parameters.h"
 
 
 template<typename PARAMETERS>

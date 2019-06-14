@@ -1,5 +1,5 @@
 #pragma once
-#include "atsc_parameters.h"
+#include "common/atsc_parameters.h"
 
 #pragma once
 

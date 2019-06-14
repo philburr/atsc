@@ -84,6 +84,20 @@ public:
         }
     }
 
+    std::array<std::array<uint8_t, 12>, 3> get_carry() {
+        std::array<std::array<uint8_t, 12>, 3> carry;
+        for (size_t i = 0; i < 12; i++) {
+            carry[0][i] = z2_carry[i] ? 1 : 0;
+        }
+        for (size_t i = 0; i < 12; i++) {
+            carry[1][i] = z0a_carry[i] ? 1 : 0;
+        }
+        for (size_t i = 0; i < 12; i++) {
+            carry[2][i] = z0b_carry[i] ? 1 : 0;
+        }
+        return carry;
+    }
+
 private:
     uint64_t diff_encode_56(uint64_t v) {
         int64_t r;

@@ -8,7 +8,7 @@
 #include <cxxopts.hpp>
 
 #include "atsc/atsc.h"
-#include "atsc/atsc_parameters.h"
+#include "common/atsc_parameters.h"
 #include "defaults.h"
 
 template<typename T>
@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
     try {
         auto driver_str = std::string("driver=") + driver;
         auto device = unique_freeable_ptr<SoapySDR::Device>(SoapySDR::Device::make(driver_str), [](SoapySDR::Device* d) { SoapySDR::Device::unmake(d); });
-        auto encoder = atsc_encoder::create();
+        auto encoder = atsc::atsc_encoder::create();
         if (!encoder) {
             printf("Failed to create encoder\n");
             return 0;
@@ -75,19 +75,19 @@ int main(int argc, char* argv[]) {
         auto stream = device->setupStream(SOAPY_SDR_TX, SOAPY_SDR_CF32, {0});
         auto samples = device->getStreamMTU(stream);
 
-        int16_t* result = (int16_t*)_mm_malloc(sizeof(int16_t) * atsc_parameters::ATSC_SYMBOLS_PER_FIELD, 32);
+        int16_t* result = (int16_t*)_mm_malloc(sizeof(int16_t) * ATSC_SYMBOLS_PER_FIELD, 32);
 
 
-        auto in = std::make_unique<atsc_parameters::atsc_mpeg2_segment>();
+        auto in = std::make_unique<atsc_field_mpeg2>();
         uint8_t* in_data = in.get()->data();
-        while (fread(in_data, atsc_parameters::ATSC_DATA_SEGMENTS * atsc_parameters::ATSC_MPEG2_BYTES, 1, input.get()) == 1) {
-            encoder->process(in_data, atsc_parameters::ATSC_DATA_SEGMENTS, [device = device.get(), stream, samples, result](void* data, unsigned sz) {
+        while (fread(in_data, ATSC_DATA_SEGMENTS * ATSC_MPEG2_BYTES, 1, input.get()) == 1) {
+            encoder->process(in_data, ATSC_DATA_SEGMENTS, [device = device.get(), stream, samples, result](void* data, unsigned sz) {
 
                 int flags = 0;
                 (void)sz;
 
                 std::complex<float> *xfer = (std::complex<float>*)data;
-                auto remaining = size_t(atsc_parameters::ATSC_SYMBOLS_PER_FIELD);
+                auto remaining = size_t(ATSC_SYMBOLS_PER_FIELD);
                 while (remaining > 0) {
                     auto transfer = std::min(remaining, samples);
 

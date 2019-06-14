@@ -4,3 +4,6 @@
 [submodule "external/catch2"]
 	path = external/catch2
 	url = https://github.com/catchorg/Catch2
+[submodule "external/atsc_test_data"]
+	path = external/atsc_test_data
+	url = https://github.com/philburr/atsc_test_data.git

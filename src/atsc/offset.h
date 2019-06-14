@@ -1,15 +1,18 @@
 #pragma once
 #include <cmath>
-#include "atsc_parameters.h"
+#include <immintrin.h>
+#include "common/atsc_parameters.h"
+#include "util.h"
 
-template<typename PARAMETERS>
 struct atsc_offset {
 
-    void process_field(std::complex<float>* field) {
-        unsigned items = PARAMETERS::ATSC_SYMBOLS_PER_FIELD / 4;
+    atsc_offset() : _table(std::make_unique<aligned_array<std::complex<float>, ATSC_SYMBOLS_PER_FIELD + ATSC_SYMBOLS_PER_SEGMENT>>(table)) {}
 
-        std::complex<float> *a = field;
-        std::complex<float> *b = table.data();
+    void process_field(atsc_field_symbol_padded& field) {
+        unsigned items = (ATSC_SYMBOLS_PER_FIELD + ATSC_SYMBOLS_PER_SEGMENT) / 4;
+
+        std::complex<float> *a = field.data();
+        std::complex<float> *b = _table->data();
         std::complex<float> *s = scale.data();
 
         const __m256 e = _mm256_load_ps((float*)s);
@@ -43,6 +46,9 @@ struct atsc_offset {
     }
 
 private:
+    std::unique_ptr<aligned_array<std::complex<float>, ATSC_SYMBOLS_PER_FIELD + ATSC_SYMBOLS_PER_SEGMENT>> _table;
+
+
     struct oscillator_table_generator {
         static constexpr double frequency = 309411.0 - 3000000.0;
         static constexpr double amplitude = 0.9;
@@ -56,17 +62,17 @@ private:
                                                amplitude * sinf(phase_increment * i));
             }
 
-            scale[0] = std::complex<float>(cosf(phase_increment * table.size()),
-                                           sinf(phase_increment * table.size()));
+            scale[0] = std::complex<float>(cosf(phase_increment * ATSC_SYMBOLS_PER_FIELD),
+                                           sinf(phase_increment * ATSC_SYMBOLS_PER_FIELD));
             scale[1] = scale[0];
             scale[2] = scale[0];
             scale[3] = scale[0];
         }
 
         std::array<std::complex<float>, 4> scale;
-        std::array<std::complex<float>, PARAMETERS::ATSC_SYMBOLS_PER_FIELD> table;
+        std::array<std::complex<float>, ATSC_SYMBOLS_PER_FIELD + ATSC_SYMBOLS_PER_SEGMENT> table;
     };
 
-    __attribute__((aligned(32))) std::array<std::complex<float>, 4> scale = oscillator_table_generator().scale;
-    __attribute__((aligned(32))) std::array<std::complex<float>, PARAMETERS::ATSC_SYMBOLS_PER_FIELD> table = oscillator_table_generator().table;
+    static inline std::array<std::complex<float>, 4> scale = oscillator_table_generator().scale;
+    static inline std::array<std::complex<float>, ATSC_SYMBOLS_PER_FIELD + ATSC_SYMBOLS_PER_SEGMENT> table = oscillator_table_generator().table;
 };

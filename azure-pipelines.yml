@@ -7,8 +7,8 @@ trigger:
 - master
 
 variables:
-  CXX: g++-7
-  CC: gcc-7
+  CXX: g++-8
+  CC: gcc-8
 
 jobs:
 - job: 'Linux_Build'
@@ -21,13 +21,13 @@ jobs:
     displayName: 'Checkout submodules'
 
   - bash: |
+      sudo add-apt-repository ppa:ubuntu-toolchain-r/test
       sudo add-apt-repository -y ppa:myriadrf/drivers
       sudo apt-get update
-      sudo apt-get install -y libsoapysdr-dev
+      sudo apt-get install -y libsoapysdr-dev g++-8
     displayName: 'Installing dependencies'
 
   - bash: |
-      which g++-7
       mkdir ./build && cd ./build
       cmake -DCMAKE_BUILD_TYPE=Release ..
       make -j4

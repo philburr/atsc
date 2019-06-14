@@ -1,14 +1,13 @@
 #pragma once
 #include <immintrin.h>
 #include <cassert>
-#include "atsc_parameters.h"
+#include "common/atsc_parameters.h"
 
 
-template<typename PARAMETERS>
 struct atsc_rrc_filter {
 
-    void process_field(std::complex<float>* out, std::complex<float>* in) {
-        for (unsigned i = 0; i < PARAMETERS::ATSC_SYMBOLS_PER_FIELD; i++) {
+    void process_field(atsc_field_symbol& out, atsc_field_symbol_padded& in) {
+        for (unsigned i = 0; i < ATSC_SYMBOLS_PER_FIELD; i++) {
             filter(&out[i], &in[i]);
         }
 

@@ -13,4 +13,8 @@ target_compile_options(atsc
 )
 target_compile_definitions(atsc PRIVATE ${CXX_SSE_DEFINES})
 
-target_include_directories(atsc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
+target_include_directories(atsc
+	PUBLIC
+		${CMAKE_CURRENT_SOURCE_DIR}/..
+)
+add_subdirectory(test)

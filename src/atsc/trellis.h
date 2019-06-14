@@ -1,11 +1,12 @@
 #pragma once
 #include <immintrin.h>
-#include "atsc_parameters.h"
+#include <cstring>
+#include "common/atsc_parameters.h"
+#include "util.h"
 #include "signal.h"
 
 static std::array<uint8_t, 256> BitReverseTable256 = detail::reverse_table_initializer().table; 
 
-template<typename PARAMETERS>
 class atsc_trellis_encoder_ref {
 
     struct differential_encoder {
@@ -36,7 +37,6 @@ class atsc_trellis_encoder_ref {
         trellis_encoder() {}
 
         void process(uint8_t* output, uint8_t input) {
-            uint8_t r = 0;
             input = BitReverseTable256[input];
 
             *output++ = diff.encode(input & 1) | conv.encode((input >> 1) & 1); input >>= 2;
@@ -50,10 +50,9 @@ class atsc_trellis_encoder_ref {
     };
 };
 
-template<typename PARAMETERS>
 class atsc_trellis_encoder {
 public:
-    constexpr atsc_trellis_encoder() {
+    constexpr atsc_trellis_encoder() : z2_carry(), z0a_carry(), z0b_carry() {
         memset(z2_carry.data(), 0, z2_carry.size() * sizeof(z2_carry[0]));
         memset(z0a_carry.data(), 0, z0a_carry.size() * sizeof(z0a_carry[0]));
         memset(z0b_carry.data(), 0, z0b_carry.size() * sizeof(z0b_carry[0]));
@@ -61,25 +60,40 @@ public:
 
     static constexpr unsigned TRELLIS_ENCODERS = 12;
     static constexpr unsigned BYTES_PER_ENCODE = 13;
-    static constexpr unsigned ROUNDS = PARAMETERS::ATSC_DATA_PER_FIELD / (TRELLIS_ENCODERS * BYTES_PER_ENCODE);
-    static constexpr unsigned SYMBOLS_PER_ROUND = PARAMETERS::ATSC_DATA_SYMBOLS_PER_FIELD / ROUNDS;
+    static constexpr unsigned ROUNDS = ATSC_DATA_PER_FIELD / (TRELLIS_ENCODERS * BYTES_PER_ENCODE);
+    static constexpr unsigned SYMBOLS_PER_ROUND = ATSC_DATA_SYMBOLS_PER_FIELD / ROUNDS;
 
-    void process(typename PARAMETERS::atsc_signal_type* output, uint8_t* input) {
+    void process(atsc_field_symbol_padded& output, atsc_field_data& input) {
 
+        uint8_t* data = input.data();
         for (unsigned i = 0; i < ROUNDS; i++) {
-            trellis_encode(output, input, i, 0); input += 13;
-            trellis_encode(output, input, i, 1); input += 13;
-            trellis_encode(output, input, i, 2); input += 13;
-            trellis_encode(output, input, i, 3); input += 13;
-            trellis_encode(output, input, i, 4); input += 13;
-            trellis_encode(output, input, i, 5); input += 13;
-            trellis_encode(output, input, i, 6); input += 13;
-            trellis_encode(output, input, i, 7); input += 13;
-            trellis_encode(output, input, i, 8); input += 13;
-            trellis_encode(output, input, i, 9); input += 13;
-            trellis_encode(output, input, i, 10); input += 13;
-            trellis_encode(output, input, i, 11); input += 13;
+            trellis_encode(output, data, i, 0); data += 13;
+            trellis_encode(output, data, i, 1); data += 13;
+            trellis_encode(output, data, i, 2); data += 13;
+            trellis_encode(output, data, i, 3); data += 13;
+            trellis_encode(output, data, i, 4); data += 13;
+            trellis_encode(output, data, i, 5); data += 13;
+            trellis_encode(output, data, i, 6); data += 13;
+            trellis_encode(output, data, i, 7); data += 13;
+            trellis_encode(output, data, i, 8); data += 13;
+            trellis_encode(output, data, i, 9); data += 13;
+            trellis_encode(output, data, i, 10); data += 13;
+            trellis_encode(output, data, i, 11); data += 13;
         }
+    }
+
+    std::array<std::array<uint8_t, 12>, 3> get_carry() {
+        std::array<std::array<uint8_t, 12>, 3> carry;
+        for (size_t i = 0; i < 12; i++) {
+            carry[0][i] = z2_carry[i] ? 1 : 0;
+        }
+        for (size_t i = 0; i < 12; i++) {
+            carry[1][i] = z0a_carry[i] ? 1 : 0;
+        }
+        for (size_t i = 0; i < 12; i++) {
+            carry[2][i] = z0b_carry[i] ? 1 : 0;
+        }
+        return carry;
     }
 
 private:
@@ -104,7 +118,7 @@ private:
     }
 
     // Input is 13 bytes, output is 52 bytes
-    void trellis_encode(typename PARAMETERS::atsc_signal_type* out, uint8_t *data, int round, int encoder) {
+    void trellis_encode(atsc_field_symbol_padded& out, uint8_t *data, int round, int encoder) {
         // The input data is processed in chunks of twelve bytes
         // each byte is fed to a different trellis encoder
         // Each byte is then split up into bit pairs from MSB to LSB (7,6), (5,4), (3,2), (1,0)
@@ -227,7 +241,7 @@ private:
         z0a_carry[encoder] = ((int32_t)z0a) >> 31;
         z0b_carry[encoder] = ((int32_t)z0b) >> 31;
 
-        using xformer = atsc_symbol_to_signal<typename PARAMETERS::atsc_signal_type>;
+        using xformer = atsc_symbol_to_signal<atsc_symbol_type>;
 
         // Redistribute bits
         uint32_t start = round * SYMBOLS_PER_ROUND + encoder * 52;
@@ -561,13 +575,13 @@ private:
     static inline std::array<int8_t, 256> diff_half_table = diff_table_initializer().half_table;
 
     struct output_table_initializer {
-        static inline constexpr size_t len = PARAMETERS::ATSC_DATA_SYMBOLS_PER_SEGMENT * PARAMETERS::ATSC_DATA_SEGMENTS;
+        static inline constexpr size_t len = ATSC_DATA_SYMBOLS_PER_SEGMENT * ATSC_DATA_SEGMENTS;
 
         output_table_initializer() : table() {
 
             for (size_t index = 0; index < len; index++) {
-                unsigned dseg = index / PARAMETERS::ATSC_DATA_SYMBOLS_PER_SEGMENT;
-                unsigned dseg_offset = index % PARAMETERS::ATSC_DATA_SYMBOLS_PER_SEGMENT;
+                unsigned dseg = index / ATSC_DATA_SYMBOLS_PER_SEGMENT;
+                unsigned dseg_offset = index % ATSC_DATA_SYMBOLS_PER_SEGMENT;
 
                 unsigned start_trellis = (dseg * 4) % 12;
                 unsigned trellis = (start_trellis + index) % 12;
@@ -579,7 +593,7 @@ private:
 
                 // index is ordered output of the trellis output commutator
                 // insert space for sync 
-                unsigned adjusted_index = (dseg + 1) * PARAMETERS::ATSC_SYMBOLS_PER_SEGMENT + 4 + dseg_offset;
+                unsigned adjusted_index = (dseg + 1) * ATSC_SYMBOLS_PER_SEGMENT + 4 + dseg_offset;
 
                 table[offset] = adjusted_index;
             }

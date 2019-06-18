@@ -1,12 +1,12 @@
 #pragma once
 #include "lfsr.h"
 
-template<typename PARAMETERS>
+template<typename T>
 struct field_sync_table {
 
 private:
     struct initializer {
-        constexpr static inline size_t len = PARAMETERS::ATSC_SYMBOLS_PER_SEGMENT - PARAMETERS::ATSC_RESERVED_SYMBOLS - PARAMETERS::ATSC_SYMBOLS_PER_BYTE;
+        constexpr static inline size_t len = ATSC_SYMBOLS_PER_SEGMENT - ATSC_RESERVED_SYMBOLS - ATSC_SYMBOLS_PER_BYTE;
 
         constexpr initializer(bool even, std::array<uint8_t, 511> pn511, std::array<uint8_t, 63> pn63) : table() {
 
@@ -29,7 +29,7 @@ private:
                 table[sym] = vsb_mode[i] ? 6 : 1;
             }
 
-            for (size_t i = 0; i < 104 - PARAMETERS::ATSC_RESERVED_SYMBOLS; i++, sym++) {
+            for (size_t i = 0; i < 104 - ATSC_RESERVED_SYMBOLS; i++, sym++) {
                 table[sym] = pn63[i % pn63.size()] ? 6 : 1;
             }
         }

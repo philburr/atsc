@@ -4,13 +4,13 @@
 #include <cstring>
 
 void generate_test_data() {
-    atsc_trellis_encoder<atsc_parameters> trellis;
+    atsc_trellis_encoder trellis;
 
-    auto input1 = random_vector_data<atsc_parameters::atsc_field_data>();
-    auto input2 = random_vector_data<atsc_parameters::atsc_field_data>();
+    auto input1 = random_vector_data<atsc_field_data>();
+    auto input2 = random_vector_data<atsc_field_data>();
 
-    auto output1 = std::make_unique<atsc_parameters::atsc_field_signal>();
-    auto output2 = std::make_unique<atsc_parameters::atsc_field_signal>();
+    auto output1 = std::make_unique<atsc_field_signal>();
+    auto output2 = std::make_unique<atsc_field_signal>();
 
     trellis.process(output1->data(), input1->data());
     trellis.process(output2->data(), input2->data());
@@ -22,16 +22,16 @@ void generate_test_data() {
 }
 
 TEST_CASE("ATSC Trellis Encoder", "[trellis]") {
-    atsc_trellis_encoder<atsc_parameters> trellis;
+    atsc_trellis_encoder trellis;
 
-    auto input1 = load_vector_data<atsc_parameters::atsc_field_data>("trellis_input1.data");
-    auto input2 = load_vector_data<atsc_parameters::atsc_field_data>("trellis_input2.data");
+    auto input1 = load_vector_data<atsc_field_data>("trellis_input1.data");
+    auto input2 = load_vector_data<atsc_field_data>("trellis_input2.data");
 
-    auto output1 = load_vector_data<atsc_parameters::atsc_field_signal>("trellis_output1.data");
-    auto output2 = load_vector_data<atsc_parameters::atsc_field_signal>("trellis_output2.data");
+    auto output1 = load_vector_data<atsc_field_signal>("trellis_output1.data");
+    auto output2 = load_vector_data<atsc_field_signal>("trellis_output2.data");
 
-    auto test1 = std::make_unique<atsc_parameters::atsc_field_signal>();
-    auto test2 = std::make_unique<atsc_parameters::atsc_field_signal>();
+    auto test1 = std::make_unique<atsc_field_signal>();
+    auto test2 = std::make_unique<atsc_field_signal>();
 
     trellis.process(test1->data(), input1->data());
     trellis.process(test2->data(), input2->data());

@@ -7,15 +7,15 @@ TEST_CASE("ATSC Tune", "[opencl,tune]") {
     atsc_opencl atsc;
 
     // One field of pure DC
-    auto ocl_data = atsc_parameters::atsc_field_signal();
-    alignas(32) auto valid_data = atsc_parameters::atsc_field_signal();
+    auto ocl_data = atsc_field_signal();
+    alignas(32) auto valid_data = atsc_field_signal();
     for (size_t i = 0; i < ocl_data.size(); i++) {
-        ocl_data[i] = atsc_parameters::atsc_signal_type(1, 0);
-        valid_data[i] = atsc_parameters::atsc_signal_type(1, 0);
+        ocl_data[i] = atsc_symbol_type(1, 0);
+        valid_data[i] = atsc_symbol_type(1, 0);
     }
 
     // Use atsc_randomizer to generate validation data
-    auto offset = atsc_offset<atsc_parameters>();
+    auto offset = atsc_offset();
     offset.process_field(valid_data.data());
 
     auto data = atsc.cl_alloc(ocl_data.size() * sizeof(ocl_data[0]));

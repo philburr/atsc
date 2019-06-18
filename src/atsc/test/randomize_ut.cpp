@@ -4,10 +4,10 @@
 
 void generate_test_data() {
 
-    atsc_randomize<atsc_parameters> randomize;
+    atsc_randomize<void> randomize;
 
-    auto input = random_vector_data<atsc_parameters::atsc_field_mpeg2>();
-    auto output = std::make_unique<atsc_parameters::atsc_field_data>();
+    auto input = random_vector_data<atsc_field_mpeg2>();
+    auto output = std::make_unique<atsc_field_data>();
 
     randomize.randomize_pkts(output->data(), input->data());
 
@@ -18,11 +18,11 @@ void generate_test_data() {
 
 TEST_CASE("ATSC Randomize", "[randomize]") {
 
-    atsc_randomize<atsc_parameters> randomize;
+    atsc_randomize<void> randomize;
 
-    auto input = load_vector_data<atsc_parameters::atsc_field_mpeg2>("randomize_input.data");
-    auto output = load_vector_data<atsc_parameters::atsc_field_data>("randomize_output.data");
-    auto test = std::make_unique<atsc_parameters::atsc_field_data>();
+    auto input = load_vector_data<atsc_field_mpeg2>("randomize_input.data");
+    auto output = load_vector_data<atsc_field_data>("randomize_output.data");
+    auto test = std::make_unique<atsc_field_data>();
 
     randomize.randomize_pkts(test->data(), input->data());
 

@@ -7,7 +7,7 @@ struct atsc_field_sync_cl : virtual opencl_base {
 
 tprotected:
     cl_event field_sync(cl_mem signal, cl_event event = nullptr) {
-        size_t count = atsc_parameters::ATSC_SYMBOLS_PER_SEGMENT + atsc_parameters::ATSC_SYMBOLS_PER_BYTE * atsc_parameters::ATSC_DATA_SEGMENTS + atsc_parameters::ATSC_RESERVED_SYMBOLS;
+        size_t count = ATSC_SYMBOLS_PER_SEGMENT + ATSC_SYMBOLS_PER_BYTE * ATSC_DATA_SEGMENTS + ATSC_RESERVED_SYMBOLS;
         gpuErrchk(clSetKernelArg(_field_sync, 0, sizeof(cl_mem), &signal));
         gpuErrchk(clSetKernelArg(_field_sync, 1, sizeof(cl_mem), &_saved_symbols));
         gpuErrchk(clSetKernelArg(_field_sync, 2, sizeof(cl_mem), &_field_sync_curr));
@@ -31,9 +31,9 @@ protected:
         to_device(_field_sync_odd, _fs_table.field_sync_odd.data(), _fs_table.field_sync_odd.size());
         _field_sync_curr = _field_sync_even;
 
-        _saved_symbols = cl_alloc(atsc_parameters::ATSC_RESERVED_SYMBOLS * sizeof(atsc_parameters::atsc_field_signal));
-        _last_saved_symbols = cl_alloc(atsc_parameters::ATSC_RESERVED_SYMBOLS * sizeof(atsc_parameters::atsc_field_signal));
-        cl_memset(_last_saved_symbols, atsc_parameters::ATSC_RESERVED_SYMBOLS * sizeof(atsc_parameters::atsc_field_signal));
+        _saved_symbols = cl_alloc(ATSC_RESERVED_SYMBOLS * sizeof(atsc_symbol_type));
+        _last_saved_symbols = cl_alloc(ATSC_RESERVED_SYMBOLS * sizeof(atsc_symbol_type));
+        cl_memset(_last_saved_symbols, ATSC_RESERVED_SYMBOLS * sizeof(atsc_symbol_type));
 
         compile();
     }
@@ -56,17 +56,17 @@ private:
     cl_mem _saved_symbols;
     cl_mem _last_saved_symbols;
 
-    field_sync_table<atsc_parameters> _fs_table;
+    field_sync_table<void> _fs_table;
 
     void compile() {
         _program = compile_program(kernel_prefix + R"#(
 __kernel void field_sync(__global float2* signal, __global float2* saved_symbols, __global uint8_t* sync_segment, __global float2* last_saved_symbols) {
     const int i = get_global_id(0);
 
-    const unsigned symbols_per_field = )#" + string_from<unsigned, atsc_parameters::ATSC_SYMBOLS_PER_FIELD>::value + R"#(;
-    const unsigned symbols_per_segment = )#" + string_from<unsigned, atsc_parameters::ATSC_SYMBOLS_PER_SEGMENT>::value + R"#(;
-    const unsigned reserved_symbols = )#" + string_from<unsigned, atsc_parameters::ATSC_RESERVED_SYMBOLS>::value + R"#(;
-    const unsigned segments = )#" + string_from<unsigned, atsc_parameters::ATSC_DATA_SEGMENTS>::value + R"#(;
+    const unsigned symbols_per_field = )#" + string_from<unsigned, ATSC_SYMBOLS_PER_FIELD>::value + R"#(;
+    const unsigned symbols_per_segment = )#" + string_from<unsigned, ATSC_SYMBOLS_PER_SEGMENT>::value + R"#(;
+    const unsigned reserved_symbols = )#" + string_from<unsigned, ATSC_RESERVED_SYMBOLS>::value + R"#(;
+    const unsigned segments = )#" + string_from<unsigned, ATSC_DATA_SEGMENTS>::value + R"#(;
     const unsigned reserved_index = symbols_per_segment + 4 * segments;
 
     float2 sig;

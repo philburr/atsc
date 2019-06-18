@@ -15,18 +15,18 @@
 struct atsc_encoder_impl : public atsc_encoder {
 
     atsc_encoder_impl() : input_received(0) {
-        for (unsigned i = 0; i < atsc_parameters::ATSC_RESERVED_SYMBOLS; i++) {
-            saved_symbols[i] = atsc_symbol_to_signal<atsc_parameters::atsc_signal_type>::xform(0);
+        for (unsigned i = 0; i < ATSC_RESERVED_SYMBOLS; i++) {
+            saved_symbols[i] = atsc_symbol_to_signal<atsc_symbol_type>::xform(0);
         }
         
-        input = std::make_unique<atsc_parameters::atsc_field_mpeg2>();
-        encoded = std::make_unique<atsc_parameters::atsc_field_data>();
-        field1 = std::make_unique<atsc_parameters::atsc_field_data>();
-        field2 = std::make_unique<atsc_parameters::atsc_field_data>();
+        input = std::make_unique<atsc_field_mpeg2>();
+        encoded = std::make_unique<atsc_field_data>();
+        field1 = std::make_unique<atsc_field_data>();
+        field2 = std::make_unique<atsc_field_data>();
 
-        out = unique_freeable_ptr<std::complex<float>>((std::complex<float>*)_mm_malloc(sizeof(atsc_parameters::atsc_signal_type) * (atsc_parameters::ATSC_SYMBOLS_PER_FIELD + atsc_parameters::ATSC_SYMBOLS_PER_SEGMENT), 32), _mm_free);
-        field_sync.process_segment(out.get() + atsc_parameters::ATSC_SYMBOLS_PER_FIELD);
-        filtered = unique_freeable_ptr<std::complex<float>>((std::complex<float>*)_mm_malloc(sizeof(atsc_parameters::atsc_signal_type) * atsc_parameters::ATSC_SYMBOLS_PER_FIELD, 32), _mm_free);
+        out = unique_freeable_ptr<std::complex<float>>((std::complex<float>*)_mm_malloc(sizeof(atsc_symbol_type) * (ATSC_SYMBOLS_PER_FIELD + ATSC_SYMBOLS_PER_SEGMENT), 32), _mm_free);
+        field_sync.process_segment(out.get() + ATSC_SYMBOLS_PER_FIELD);
+        filtered = unique_freeable_ptr<std::complex<float>>((std::complex<float>*)_mm_malloc(sizeof(atsc_symbol_type) * ATSC_SYMBOLS_PER_FIELD, 32), _mm_free);
 
         memset(field1->data(), 0, field1->size());
 
@@ -34,19 +34,19 @@ struct atsc_encoder_impl : public atsc_encoder {
         next_field = field2.get()->data();
     }
 
-    atsc_parameters::atsc_signal_type saved_symbols[atsc_parameters::ATSC_RESERVED_SYMBOLS];
-    atsc_randomize<atsc_parameters> randomizer;
-    atsc_reed_solomon<atsc_parameters> fec;
-    atsc_interleaver<atsc_parameters, true> interleaver;
-    atsc_trellis_encoder<atsc_parameters> trellis;
-    atsc_field_sync<atsc_parameters> field_sync;
-    atsc_offset<atsc_parameters> offset;
-    atsc_rrc_filter<atsc_parameters> filter;
+    atsc_symbol_type saved_symbols[ATSC_RESERVED_SYMBOLS];
+    atsc_randomize<void> randomizer;
+    atsc_reed_solomon fec;
+    atsc_interleaver<true> interleaver;
+    atsc_trellis_encoder trellis;
+    atsc_field_sync<void> field_sync;
+    atsc_offset offset;
+    atsc_rrc_filter filter;
 
-    std::unique_ptr<atsc_parameters::atsc_field_mpeg2> input;
-    std::unique_ptr<atsc_parameters::atsc_field_data> encoded;
-    std::unique_ptr<atsc_parameters::atsc_field_data> field1;
-    std::unique_ptr<atsc_parameters::atsc_field_data> field2;
+    std::unique_ptr<atsc_field_mpeg2> input;
+    std::unique_ptr<atsc_field_data> encoded;
+    std::unique_ptr<atsc_field_data> field1;
+    std::unique_ptr<atsc_field_data> field2;
     unique_freeable_ptr<std::complex<float>> out;
     unique_freeable_ptr<std::complex<float>> filtered;
 
@@ -58,7 +58,7 @@ struct atsc_encoder_impl : public atsc_encoder {
     // Process N 188-byte MPEG-2 transport packets
     void process(uint8_t* pkt, unsigned count, std::function<void(void*,unsigned)> fn) {
         uint8_t* in_data = input->data();
-        size_t byte_count = count * atsc_parameters::ATSC_MPEG2_BYTES;
+        size_t byte_count = count * ATSC_MPEG2_BYTES;
 
         while (byte_count > 0) {
             size_t remaining = input->size() - input_received; 
@@ -79,7 +79,7 @@ struct atsc_encoder_impl : public atsc_encoder {
     void process_field(std::function<void(void*,unsigned)> fn) {
         uint8_t* in_data = input.get()->data();
         uint8_t* encoded_data = encoded.get()->data();
-        atsc_parameters::atsc_signal_type* out_data = out.get();
+        atsc_symbol_type* out_data = out.get();
 
         randomizer.randomize_pkts(encoded_data, in_data);
         fec.process_field(encoded_data);
@@ -90,7 +90,7 @@ struct atsc_encoder_impl : public atsc_encoder {
         filter.process_field(filtered.get(), out_data);
 
         std::swap(current_field, next_field);
-        fn(filtered.get(), atsc_parameters::ATSC_SYMBOLS_PER_FIELD * sizeof(std::complex<float>));
+        fn(filtered.get(), ATSC_SYMBOLS_PER_FIELD * sizeof(std::complex<float>));
     }
 };
 

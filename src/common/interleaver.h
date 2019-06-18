@@ -4,19 +4,19 @@
 #include <cassert>
 #include <array>
 
-template<typename PARAMETERS, size_t CONTIGUOUS_TRELLIS_INPUT>
+template<size_t CONTIGUOUS_TRELLIS_INPUT>
 struct trellis_deinterleaver {
     constexpr trellis_deinterleaver() {}
 
 private:
-    static inline constexpr size_t len = PARAMETERS::ATSC_DATA_PER_FIELD;
+    static inline constexpr size_t len = ATSC_DATA_PER_FIELD;
     struct initializer {
         constexpr initializer() : table() {
             for (size_t index = 0; index < len; index++) {
-                const uint32_t group_size = CONTIGUOUS_TRELLIS_INPUT * PARAMETERS::ATSC_TRELLIS_ENCODERS; 
+                const uint32_t group_size = CONTIGUOUS_TRELLIS_INPUT * ATSC_TRELLIS_ENCODERS; 
                 uint32_t group = index / group_size;
-                uint32_t row = (index % group_size) / PARAMETERS::ATSC_TRELLIS_ENCODERS;
-                uint32_t col = (index) % PARAMETERS::ATSC_TRELLIS_ENCODERS;
+                uint32_t row = (index % group_size) / ATSC_TRELLIS_ENCODERS;
+                uint32_t col = (index) % ATSC_TRELLIS_ENCODERS;
                 uint32_t destination = group * group_size + col * CONTIGUOUS_TRELLIS_INPUT + row;
 
                 table[index] = destination;
@@ -29,19 +29,19 @@ public:
     static inline std::array<uint16_t, len> table = initializer().table;
 };
 
-template<typename PARAMETERS, size_t CONTIGUOUS_TRELLIS_INPUT>
+template<size_t CONTIGUOUS_TRELLIS_INPUT>
 struct trellis_interleaver {
     constexpr trellis_interleaver() {}
 
 private:
-    static inline constexpr size_t len = PARAMETERS::ATSC_DATA_PER_FIELD;
+    static inline constexpr size_t len = ATSC_DATA_PER_FIELD;
     struct initializer {
         initializer() : table() {
             for (size_t index = 0; index < len; index++) {
-                const uint32_t group_size = CONTIGUOUS_TRELLIS_INPUT * PARAMETERS::ATSC_TRELLIS_ENCODERS; 
+                const uint32_t group_size = CONTIGUOUS_TRELLIS_INPUT * ATSC_TRELLIS_ENCODERS; 
                 uint32_t group = index / group_size;
-                uint32_t row = (index % group_size) / PARAMETERS::ATSC_TRELLIS_ENCODERS;
-                uint32_t col = (index) % PARAMETERS::ATSC_TRELLIS_ENCODERS;
+                uint32_t row = (index % group_size) / ATSC_TRELLIS_ENCODERS;
+                uint32_t col = (index) % ATSC_TRELLIS_ENCODERS;
                 uint32_t destination = group * group_size + col * CONTIGUOUS_TRELLIS_INPUT + row;
 
                 table[destination] = index;
@@ -54,21 +54,21 @@ public:
     static inline std::array<uint16_t, len> table = initializer().table;
 };
 
-template<typename PARAMETERS, size_t CONTIGUOUS_TRELLIS_INPUT>
+template<size_t CONTIGUOUS_TRELLIS_INPUT>
 struct interleaver {
     constexpr interleaver() {}
 
 private:
     struct initializer {
-        static inline constexpr size_t len   = PARAMETERS::ATSC_DATA_PER_FIELD;
-        static inline constexpr uint32_t trellis_input_size = CONTIGUOUS_TRELLIS_INPUT; // SOFTWARE_DECODE ? 13 : (PARAMETERS::ATSC_DATA_PER_FIELD / PARAMETERS::ATSC_TRELLIS_ENCODERS);
-        static inline auto deinterleaver_table = trellis_deinterleaver<PARAMETERS, trellis_input_size>::table;
+        static inline constexpr size_t len   = ATSC_DATA_PER_FIELD;
+        static inline constexpr uint32_t trellis_input_size = CONTIGUOUS_TRELLIS_INPUT; // SOFTWARE_DECODE ? 13 : (ATSC_DATA_PER_FIELD / ATSC_TRELLIS_ENCODERS);
+        static inline auto deinterleaver_table = trellis_deinterleaver<trellis_input_size>::table;
 
         uint32_t trellis_rotate(uint32_t index) {
-            static std::array<uint32_t, PARAMETERS::ATSC_DATA_SEGMENTS * 3> trellis_rotate_points = []() {
-                std::array<uint32_t, PARAMETERS::ATSC_DATA_SEGMENTS * 3> arr;
-                for (unsigned i = 0; i < PARAMETERS::ATSC_DATA_SEGMENTS * 3; i++) {
-                    arr[i] = ((PARAMETERS::ATSC_SEGMENT_FEC_BYTES * i + PARAMETERS::ATSC_TRELLIS_ENCODERS - 1) / PARAMETERS::ATSC_TRELLIS_ENCODERS) * PARAMETERS::ATSC_TRELLIS_ENCODERS;
+            static std::array<uint32_t, ATSC_DATA_SEGMENTS * 3> trellis_rotate_points = []() {
+                std::array<uint32_t, ATSC_DATA_SEGMENTS * 3> arr;
+                for (unsigned i = 0; i < ATSC_DATA_SEGMENTS * 3; i++) {
+                    arr[i] = ((ATSC_SEGMENT_FEC_BYTES * i + ATSC_TRELLIS_ENCODERS - 1) / ATSC_TRELLIS_ENCODERS) * ATSC_TRELLIS_ENCODERS;
                 }
                 return arr;
             }();
@@ -78,14 +78,14 @@ private:
             if (index == trellis_rotate_points[next_shift_point]) {
                 shift += 4;
                 next_shift_point++;
-                if (shift == PARAMETERS::ATSC_TRELLIS_ENCODERS) {
+                if (shift == ATSC_TRELLIS_ENCODERS) {
                     shift = 0;
                 }
             }
 
-            uint32_t trellis_group = index / PARAMETERS::ATSC_TRELLIS_ENCODERS;
-            uint32_t trellis_index = (index + shift) % PARAMETERS::ATSC_TRELLIS_ENCODERS;
-            uint32_t destination = trellis_group * PARAMETERS::ATSC_TRELLIS_ENCODERS + trellis_index;
+            uint32_t trellis_group = index / ATSC_TRELLIS_ENCODERS;
+            uint32_t trellis_index = (index + shift) % ATSC_TRELLIS_ENCODERS;
+            uint32_t destination = trellis_group * ATSC_TRELLIS_ENCODERS + trellis_index;
 
             return destination;
         }
@@ -159,14 +159,14 @@ public:
 
 };
 
-template<typename PARAMETERS, size_t CONTIGUOUS_TRELLIS_INPUT>
+template<size_t CONTIGUOUS_TRELLIS_INPUT>
 class interleaver_old {
 public:
     constexpr interleaver_old() {}
 
 private:
     struct table_initializer {
-        static inline constexpr size_t len = PARAMETERS::ATSC_SEGMENT_FEC_BYTES * PARAMETERS::ATSC_DATA_SEGMENTS;
+        static inline constexpr size_t len = ATSC_SEGMENT_FEC_BYTES * ATSC_DATA_SEGMENTS;
         static inline constexpr size_t contiguous_trellis_input = CONTIGUOUS_TRELLIS_INPUT;
 
         /* constexpr is unfortunately slow here */
@@ -178,9 +178,9 @@ private:
                 indices[i] = 0;
             }
 
-            std::array<uint32_t, PARAMETERS::ATSC_DATA_SEGMENTS * 3> trellis_rotate_points;
-            for (unsigned i = 0; i < PARAMETERS::ATSC_DATA_SEGMENTS * 3; i++) {
-                trellis_rotate_points[i] = ((PARAMETERS::ATSC_SEGMENT_FEC_BYTES * i + PARAMETERS::ATSC_TRELLIS_ENCODERS - 1) / PARAMETERS::ATSC_TRELLIS_ENCODERS) * PARAMETERS::ATSC_TRELLIS_ENCODERS;
+            std::array<uint32_t, ATSC_DATA_SEGMENTS * 3> trellis_rotate_points;
+            for (unsigned i = 0; i < ATSC_DATA_SEGMENTS * 3; i++) {
+                trellis_rotate_points[i] = ((ATSC_SEGMENT_FEC_BYTES * i + ATSC_TRELLIS_ENCODERS - 1) / ATSC_TRELLIS_ENCODERS) * ATSC_TRELLIS_ENCODERS;
             }
             uint32_t *next_boundary = &trellis_rotate_points[1];
             uint32_t shift = 0;
@@ -190,7 +190,7 @@ private:
                 if (output == *next_boundary) {
                     next_boundary++;
                     shift += 4;
-                    if (shift == PARAMETERS::ATSC_TRELLIS_ENCODERS) {
+                    if (shift == ATSC_TRELLIS_ENCODERS) {
                         shift = 0;
                     }
                 }
@@ -198,10 +198,10 @@ private:
                 // transpose
                 size_t destination;
                 constexpr uint32_t trellis_input_size = contiguous_trellis_input;
-                const uint32_t group_size = trellis_input_size * PARAMETERS::ATSC_TRELLIS_ENCODERS; 
+                const uint32_t group_size = trellis_input_size * ATSC_TRELLIS_ENCODERS; 
                 uint32_t group = output / group_size;
-                uint32_t row = (output % group_size) / PARAMETERS::ATSC_TRELLIS_ENCODERS;
-                uint32_t col = (output + shift) % PARAMETERS::ATSC_TRELLIS_ENCODERS;
+                uint32_t row = (output % group_size) / ATSC_TRELLIS_ENCODERS;
+                uint32_t col = (output + shift) % ATSC_TRELLIS_ENCODERS;
                 destination = group * group_size + col * trellis_input_size + row;
 
                 // split into current/next field

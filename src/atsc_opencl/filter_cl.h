@@ -7,7 +7,7 @@ struct atsc_filter_cl : virtual opencl_base {
 
 tprotected:
     cl_event filter(cl_mem output, cl_mem input, cl_event event = nullptr) {
-        size_t count = atsc_parameters::ATSC_SYMBOLS_PER_FIELD;
+        size_t count = ATSC_SYMBOLS_PER_FIELD;
         gpuErrchk(clSetKernelArg(_fir_filter, 0, sizeof(cl_mem), &output));
         gpuErrchk(clSetKernelArg(_fir_filter, 1, sizeof(cl_mem), &input));
         gpuErrchk(clSetKernelArg(_fir_filter, 2, sizeof(cl_mem), &_taps));

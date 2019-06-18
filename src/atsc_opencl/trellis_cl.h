@@ -12,15 +12,15 @@ tprotected:
     {
         gpuErrchk(clSetKernelArg(_trellis_sort_bits, 0, sizeof(cl_mem), &_trellis_bits));
         gpuErrchk(clSetKernelArg(_trellis_sort_bits, 1, sizeof(cl_mem), &input));
-        size_t work[] = { rounded_input_per_trellis/sizeof(uint32_t), atsc_parameters::ATSC_TRELLIS_ENCODERS, differential_encoders };
+        size_t work[] = { rounded_input_per_trellis/sizeof(uint32_t), ATSC_TRELLIS_ENCODERS, differential_encoders };
         event = start_kernel(_trellis_sort_bits, 3, &work[0], event);
 
         gpuErrchk(clSetKernelArg(_trellis_popcount, 0, sizeof(cl_mem), &_trellis_popcount1));
         gpuErrchk(clSetKernelArg(_trellis_popcount, 1, sizeof(cl_mem), &_trellis_bits));
-        size_t pop_work[] = { trellis_popcount_size, atsc_parameters::ATSC_TRELLIS_ENCODERS, 4 };
+        size_t pop_work[] = { trellis_popcount_size, ATSC_TRELLIS_ENCODERS, 4 };
         event = start_kernel(_trellis_popcount, 3, &pop_work[0], event);
 
-        size_t sum_work[] = { trellis_popcount_size + 1, atsc_parameters::ATSC_TRELLIS_ENCODERS, differential_encoders - 1 };
+        size_t sum_work[] = { trellis_popcount_size + 1, ATSC_TRELLIS_ENCODERS, differential_encoders - 1 };
         for (uint32_t stride = 1; stride < trellis_popcount_size + 1; stride <<= 1) {
             gpuErrchk(clSetKernelArg(_trellis_popcount_sum, 0, sizeof(cl_mem), &_trellis_popcount2));
             gpuErrchk(clSetKernelArg(_trellis_popcount_sum, 1, sizeof(cl_mem), &_trellis_popcount1));
@@ -34,21 +34,21 @@ tprotected:
         gpuErrchk(clSetKernelArg(_trellis, 1, sizeof(cl_mem), &_trellis_popcount1));
         gpuErrchk(clSetKernelArg(_trellis, 2, sizeof(cl_mem), &_diff_table));
         gpuErrchk(clSetKernelArg(_trellis, 3, sizeof(cl_mem), &_diff_table2));
-        size_t diff_work[] = { trellis_popcount_size, atsc_parameters::ATSC_TRELLIS_ENCODERS, differential_encoders - 1 };
+        size_t diff_work[] = { trellis_popcount_size, ATSC_TRELLIS_ENCODERS, differential_encoders - 1 };
         event = start_kernel(_trellis, 3, &diff_work[0], event);
 
         gpuErrchk(clSetKernelArg(_trellis_encode_signal, 0, sizeof(cl_mem), &output));
         gpuErrchk(clSetKernelArg(_trellis_encode_signal, 1, sizeof(cl_mem), &_trellis_bits));
         gpuErrchk(clSetKernelArg(_trellis_encode_signal, 2, sizeof(cl_mem), &_trellis_popcount1));
         gpuErrchk(clSetKernelArg(_trellis_encode_signal, 3, sizeof(cl_mem), &_output_commutator_table));
-        size_t encode_work[] = { ATSC_TRELLIS_INPUT_OPENCL * atsc_parameters::ATSC_SYMBOLS_PER_BYTE, atsc_parameters::ATSC_TRELLIS_ENCODERS };
+        size_t encode_work[] = { ATSC_TRELLIS_INPUT_OPENCL * ATSC_SYMBOLS_PER_BYTE, ATSC_TRELLIS_ENCODERS };
         return start_kernel(_trellis_encode_signal, 2, &encode_work[0], event);
     }
 
 tprivate:
     std::array<std::array<uint8_t, 12>, 3> get_carry() {
-        auto popcnt = new uint8_t[atsc_parameters::ATSC_TRELLIS_ENCODERS][differential_encoders][trellis_popcount_size + 1];
-        to_host(popcnt, _trellis_popcount1, (trellis_popcount_size + 1) * differential_encoders * atsc_parameters::ATSC_TRELLIS_ENCODERS);
+        auto popcnt = new uint8_t[ATSC_TRELLIS_ENCODERS][differential_encoders][trellis_popcount_size + 1];
+        to_host(popcnt, _trellis_popcount1, (trellis_popcount_size + 1) * differential_encoders * ATSC_TRELLIS_ENCODERS);
         std::array<std::array<uint8_t, 12>, 3> carry;
         for (size_t i = 0; i < 3; i++) {
             for (size_t j = 0; j < 12; j++) {
@@ -63,12 +63,12 @@ tprivate:
 protected:
     atsc_trellis_cl() : opencl_base() {
 
-        _trellis_bits = cl_alloc(diff_encoder_table_size * differential_encoders * atsc_parameters::ATSC_TRELLIS_ENCODERS);
-        cl_memset(_trellis_bits, diff_encoder_table_size * differential_encoders * atsc_parameters::ATSC_TRELLIS_ENCODERS);
+        _trellis_bits = cl_alloc(diff_encoder_table_size * differential_encoders * ATSC_TRELLIS_ENCODERS);
+        cl_memset(_trellis_bits, diff_encoder_table_size * differential_encoders * ATSC_TRELLIS_ENCODERS);
 
-        _trellis_popcount1 = cl_alloc((trellis_popcount_size + 1) * atsc_parameters::ATSC_TRELLIS_ENCODERS * differential_encoders);
-        _trellis_popcount2 = cl_alloc((trellis_popcount_size + 1) * atsc_parameters::ATSC_TRELLIS_ENCODERS * differential_encoders);
-        cl_memset(_trellis_popcount1, (trellis_popcount_size + 1) * atsc_parameters::ATSC_TRELLIS_ENCODERS * differential_encoders);
+        _trellis_popcount1 = cl_alloc((trellis_popcount_size + 1) * ATSC_TRELLIS_ENCODERS * differential_encoders);
+        _trellis_popcount2 = cl_alloc((trellis_popcount_size + 1) * ATSC_TRELLIS_ENCODERS * differential_encoders);
+        cl_memset(_trellis_popcount1, (trellis_popcount_size + 1) * ATSC_TRELLIS_ENCODERS * differential_encoders);
 
         // differential encoder table
         _diff_table = cl_alloc_ro(_differential_table.table.size());
@@ -100,7 +100,7 @@ protected:
 
 
 private:
-    static constexpr unsigned input_per_trellis = atsc_parameters::ATSC_DATA_PER_FIELD/atsc_parameters::ATSC_TRELLIS_ENCODERS;
+    static constexpr unsigned input_per_trellis = ATSC_DATA_PER_FIELD/ATSC_TRELLIS_ENCODERS;
     static constexpr unsigned rounded_input_per_trellis = (input_per_trellis + 3) & ~3;
     static constexpr unsigned diff_encoder_table_size = ((input_per_trellis + 7) & ~7) / 2;
     static constexpr uint32_t final_input_mask = UINT32_MAX >> (8 * (rounded_input_per_trellis - input_per_trellis));
@@ -109,8 +109,8 @@ private:
     static constexpr unsigned bits_per_z12_table = input_per_trellis * 8 / 2;
     static constexpr unsigned bits_per_z0_table = input_per_trellis * 8 / 4;
 
-    differential_table<atsc_parameters> _differential_table;
-    trellis_output_commutator<atsc_parameters, ATSC_TRELLIS_INPUT_OPENCL> _trellis_output_commutator_table;
+    differential_table<void> _differential_table;
+    trellis_output_commutator<ATSC_TRELLIS_INPUT_OPENCL> _trellis_output_commutator_table;
 
     cl_program _program;
     cl_kernel _trellis;

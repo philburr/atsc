@@ -1,6 +1,6 @@
 #pragma once
 
-template<typename PARAMETERS>
+template<typename T>
 struct oscillator_table {
     constexpr oscillator_table() {}
 
@@ -24,10 +24,10 @@ private:
         }
 
         std::complex<float> scale;
-        std::array<std::complex<float>, PARAMETERS::ATSC_SYMBOLS_PER_FIELD> table;
+        std::array<std::complex<float>, ATSC_SYMBOLS_PER_FIELD> table;
     };
 
 public:
     static inline std::complex<float> scale = initializer().scale;
-    static inline std::array<std::complex<float>, PARAMETERS::ATSC_SYMBOLS_PER_FIELD> table = initializer().table;
+    static inline std::array<std::complex<float>, ATSC_SYMBOLS_PER_FIELD> table = initializer().table;
 };

@@ -1,6 +1,6 @@
 #pragma once
 
-template<typename PARAMETERS>
+template<typename T>
 struct differential_table {
     constexpr differential_table() {}
 

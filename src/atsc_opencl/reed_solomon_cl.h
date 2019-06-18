@@ -8,7 +8,7 @@ struct atsc_reed_solomon_cl : virtual opencl_base {
 tprotected:
     cl_event rs_encode(cl_mem in, cl_event event = nullptr)
     {
-        size_t count = atsc_parameters::ATSC_DATA_SEGMENTS;
+        size_t count = ATSC_DATA_SEGMENTS;
 
         gpuErrchk(clSetKernelArg(_rs_encode, 0, sizeof(cl_mem), &in));
         gpuErrchk(clSetKernelArg(_rs_encode, 1, sizeof(cl_mem), &_gf_exp));

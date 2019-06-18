@@ -8,7 +8,7 @@ struct atsc_tune_cl : virtual opencl_base {
 tprotected:
     cl_event tune(cl_mem signal, cl_event event = nullptr) {
 #if 1
-        size_t count = atsc_parameters::ATSC_SYMBOLS_PER_FIELD;
+        size_t count = ATSC_SYMBOLS_PER_FIELD;
         gpuErrchk(clSetKernelArg(_tune_signal, 0, sizeof(cl_mem), &signal));
         gpuErrchk(clSetKernelArg(_tune_signal, 1, sizeof(cl_mem), &_oscillator_table));
         gpuErrchk(clSetKernelArg(_tune_signal, 2, sizeof(_oscillator_increment), &_oscillator_increment));
@@ -19,7 +19,7 @@ tprotected:
     }
 
     cl_event tune_slow(cl_mem signal, cl_event event = nullptr) {
-        size_t count = atsc_parameters::ATSC_SYMBOLS_PER_FIELD;
+        size_t count = ATSC_SYMBOLS_PER_FIELD;
         gpuErrchk(clSetKernelArg(_tune_signal_slow, 0, sizeof(cl_mem), &signal));
         gpuErrchk(clSetKernelArg(_tune_signal_slow, 1, sizeof(double), &phase_));
         gpuErrchk(clSetKernelArg(_tune_signal_slow, 2, sizeof(double), &phase_increment_));
@@ -36,7 +36,7 @@ protected:
         _oscillator_increment = _oscillator.scale;
 
         phase_ = 0.f;
-        phase_increment_ = 2 * M_PI * oscillator_table<atsc_parameters>::frequency / oscillator_table<atsc_parameters>::sampling_frequency;
+        phase_increment_ = 2 * M_PI * oscillator_table<void>::frequency / oscillator_table<void>::sampling_frequency;
 
         compile();
     }
@@ -56,7 +56,7 @@ private:
     double phase_;
     double phase_increment_;
 
-    oscillator_table<atsc_parameters> _oscillator;
+    oscillator_table<void> _oscillator;
 
     void compile() {
         _program = compile_program(kernel_prefix + R"#(

@@ -8,7 +8,7 @@ struct atsc_randomize_cl : virtual opencl_base {
 tprotected:
     cl_event randomize(cl_mem out, cl_mem in, cl_event event = nullptr)
     {
-        size_t count = atsc_parameters::ATSC_DATA_PER_FIELD;
+        size_t count = ATSC_DATA_PER_FIELD;
         gpuErrchk(clSetKernelArg(_randomize, 0, sizeof(cl_mem), &out));
         gpuErrchk(clSetKernelArg(_randomize, 1, sizeof(cl_mem), &in));
         gpuErrchk(clSetKernelArg(_randomize, 2, sizeof(cl_mem), &_random));
@@ -35,7 +35,7 @@ private:
     cl_kernel _randomize;
     cl_mem _random;
 
-    randomize_table<atsc_parameters> _randomize_table;
+    randomize_table<void> _randomize_table;
 
     void compile() {
 

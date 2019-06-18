@@ -5,8 +5,8 @@
 #include <cstring>
 
 void generate_test_data() {
-    atsc_rrc_filter<atsc_parameters> filter;
-    using atsc_field_signal_padded = std::array<atsc_parameters::atsc_signal_type, atsc_parameters::ATSC_SYMBOLS_PER_FIELD + atsc_parameters::ATSC_SYMBOLS_PER_SEGMENT>;
+    atsc_rrc_filter filter;
+    using atsc_field_signal_padded = std::array<atsc_symbol_type, ATSC_SYMBOLS_PER_FIELD + ATSC_SYMBOLS_PER_SEGMENT>;
 
     auto input = random_vector_data<aligned<atsc_field_signal_padded>>();
     auto output = std::make_unique<aligned<atsc_field_signal_padded>>();
@@ -18,8 +18,8 @@ void generate_test_data() {
 }
 
 TEST_CASE("ATSC Filter", "[filter]") {
-    atsc_rrc_filter<atsc_parameters> filter;
-    using atsc_field_signal_padded = std::array<atsc_parameters::atsc_signal_type, atsc_parameters::ATSC_SYMBOLS_PER_FIELD + atsc_parameters::ATSC_SYMBOLS_PER_SEGMENT>;
+    atsc_rrc_filter filter;
+    using atsc_field_signal_padded = std::array<atsc_symbol_type, ATSC_SYMBOLS_PER_FIELD + ATSC_SYMBOLS_PER_SEGMENT>;
 
     auto input = load_vector_data<aligned<atsc_field_signal_padded>>("filter_input.data");
     auto output = load_vector_data<atsc_field_signal_padded>("filter_output.data");

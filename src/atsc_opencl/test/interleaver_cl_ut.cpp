@@ -4,8 +4,8 @@
 #include "atsc/interleaver.h"
 
 TEST_CASE("ATSC Interleaver Refactor", "[interleaver,refactor]") {
-    auto the_new = interleaver<atsc_parameters, ATSC_TRELLIS_INPUT_OPENCL>();
-    auto the_old = interleaver_old<atsc_parameters, ATSC_TRELLIS_INPUT_OPENCL>();
+    auto the_new = interleaver<ATSC_TRELLIS_INPUT_OPENCL>();
+    auto the_old = interleaver_old<ATSC_TRELLIS_INPUT_OPENCL>();
     for (size_t i = 0; i < the_old.table.size(); i++) {
         auto field = the_new.table[i][0];
         auto index = the_new.table[i][1];
@@ -15,8 +15,8 @@ TEST_CASE("ATSC Interleaver Refactor", "[interleaver,refactor]") {
 }
 
 TEST_CASE("ATSC Interleaver SW vs HW", "[interleaver,refactor]") {
-    auto the_old = interleaver<atsc_parameters, ATSC_TRELLIS_INPUT_SOFTWARE>();
-    auto the_new = interleaver<atsc_parameters, ATSC_TRELLIS_INPUT_OPENCL>();
+    auto the_old = interleaver<ATSC_TRELLIS_INPUT_SOFTWARE>();
+    auto the_new = interleaver<ATSC_TRELLIS_INPUT_OPENCL>();
 
     auto the_old_table = the_old.table.data();
     auto the_new_table = the_new.table.data();
@@ -45,7 +45,7 @@ TEST_CASE("ATSC Interleaver SW vs HW", "[interleaver,refactor]") {
 TEST_CASE("ATSC Interleaver", "[interleaver,opencl]") {
 
     atsc_opencl atsc;
-    auto intr_table = interleaver<atsc_parameters, ATSC_TRELLIS_INPUT_OPENCL>().table;
+    auto intr_table = interleaver<ATSC_TRELLIS_INPUT_OPENCL>().table;
     (void)intr_table;
     for (unsigned i = 0; i < intr_table.size(); i++) {
         if (intr_table[i][0] == 0 && intr_table[i][1] == 0) {
@@ -53,17 +53,17 @@ TEST_CASE("ATSC Interleaver", "[interleaver,opencl]") {
         }
     }
 
-    auto data = atsc_parameters::atsc_field_data();
+    auto data = atsc_field_data();
     for (unsigned seg = 0; seg < data.size(); seg++) {
         data[seg] = seg;
     }
 
-    auto valid_frame1 = atsc_parameters::atsc_field_data();
-    auto valid_frame2 = atsc_parameters::atsc_field_data();
+    auto valid_frame1 = atsc_field_data();
+    auto valid_frame2 = atsc_field_data();
     memset(valid_frame1.data(), 0, valid_frame1.size());
     memset(valid_frame2.data(), 0, valid_frame2.size());
 
-    auto interleaver = atsc_interleaver<atsc_parameters, false>();
+    auto interleaver = atsc_interleaver<false>();
     auto ref_table = interleaver.table_.data(); (void)ref_table;
     interleaver.process(valid_frame1.data(), valid_frame2.data(), data.data());
 
@@ -71,8 +71,8 @@ TEST_CASE("ATSC Interleaver", "[interleaver,opencl]") {
     atsc.to_device(input, data.data(), data.size());
     auto new_table = atsc._interleaver_table.table.data(); (void)new_table;
 
-    auto output_frame1 = atsc_parameters::atsc_field_data();
-    auto output_frame2 = atsc_parameters::atsc_field_data();
+    auto output_frame1 = atsc_field_data();
+    auto output_frame2 = atsc_field_data();
     memset(output_frame1.data(), 0, output_frame1.size());
     memset(output_frame2.data(), 0, output_frame2.size());
 

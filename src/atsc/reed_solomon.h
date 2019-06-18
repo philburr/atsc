@@ -222,7 +222,6 @@ private:
     counted_array<int, ROOTS> locations_, roots_;
 };
 
-template<typename PARAMETERS>
 struct atsc_reed_solomon {
     atsc_reed_solomon() : rs_() {}
 
@@ -232,13 +231,13 @@ struct atsc_reed_solomon {
         uint8_t padding[40];
         memset(padding, 0, sizeof(padding));
 
-        for (size_t dseg = 0; dseg < PARAMETERS::ATSC_DATA_SEGMENTS; dseg++) {
+        for (size_t dseg = 0; dseg < ATSC_DATA_SEGMENTS; dseg++) {
 
-            uint8_t* bb = buffer + PARAMETERS::ATSC_SEGMENT_FEC_BYTES * dseg + PARAMETERS::ATSC_SEGMENT_BYTES;
+            uint8_t* bb = buffer + ATSC_SEGMENT_FEC_BYTES * dseg + ATSC_SEGMENT_BYTES;
             rs_.encode_rs((fec::gf*)bb, (fec::gf*)padding, 40);
 
-            uint8_t* curr = buffer + PARAMETERS::ATSC_SEGMENT_FEC_BYTES * dseg;
-            rs_.encode_rs((fec::gf*)bb, (fec::gf*)curr, PARAMETERS::ATSC_SEGMENT_BYTES);
+            uint8_t* curr = buffer + ATSC_SEGMENT_FEC_BYTES * dseg;
+            rs_.encode_rs((fec::gf*)bb, (fec::gf*)curr, ATSC_SEGMENT_BYTES);
         }
     }
 

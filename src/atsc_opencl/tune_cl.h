@@ -6,10 +6,10 @@
 struct atsc_tune_cl : virtual opencl_base {
 
 tprotected:
-    cl_event tune(cl_mem signal, cl_event event = nullptr) {
+    cl_event tune(cl_array<atsc_symbol_type, ATSC_SYMBOLS_PER_FIELD> signal, cl_event event = nullptr) {
 #if 1
         size_t count = ATSC_SYMBOLS_PER_FIELD;
-        gpuErrchk(clSetKernelArg(_tune_signal, 0, sizeof(cl_mem), &signal));
+        gpuErrchk(clSetKernelArg(_tune_signal, 0, sizeof(cl_mem), &signal.data()));
         gpuErrchk(clSetKernelArg(_tune_signal, 1, sizeof(cl_mem), &_oscillator_table));
         gpuErrchk(clSetKernelArg(_tune_signal, 2, sizeof(_oscillator_increment), &_oscillator_increment));
         return start_kernel(_tune_signal, 1, &count, event);

@@ -63,21 +63,22 @@ public:
     static constexpr unsigned ROUNDS = ATSC_DATA_PER_FIELD / (TRELLIS_ENCODERS * BYTES_PER_ENCODE);
     static constexpr unsigned SYMBOLS_PER_ROUND = ATSC_DATA_SYMBOLS_PER_FIELD / ROUNDS;
 
-    void process(atsc_symbol_type* output, uint8_t* input) {
+    void process(atsc_field_symbol_padded& output, atsc_field_data& input) {
 
+        uint8_t* data = input.data();
         for (unsigned i = 0; i < ROUNDS; i++) {
-            trellis_encode(output, input, i, 0); input += 13;
-            trellis_encode(output, input, i, 1); input += 13;
-            trellis_encode(output, input, i, 2); input += 13;
-            trellis_encode(output, input, i, 3); input += 13;
-            trellis_encode(output, input, i, 4); input += 13;
-            trellis_encode(output, input, i, 5); input += 13;
-            trellis_encode(output, input, i, 6); input += 13;
-            trellis_encode(output, input, i, 7); input += 13;
-            trellis_encode(output, input, i, 8); input += 13;
-            trellis_encode(output, input, i, 9); input += 13;
-            trellis_encode(output, input, i, 10); input += 13;
-            trellis_encode(output, input, i, 11); input += 13;
+            trellis_encode(output, data, i, 0); data += 13;
+            trellis_encode(output, data, i, 1); data += 13;
+            trellis_encode(output, data, i, 2); data += 13;
+            trellis_encode(output, data, i, 3); data += 13;
+            trellis_encode(output, data, i, 4); data += 13;
+            trellis_encode(output, data, i, 5); data += 13;
+            trellis_encode(output, data, i, 6); data += 13;
+            trellis_encode(output, data, i, 7); data += 13;
+            trellis_encode(output, data, i, 8); data += 13;
+            trellis_encode(output, data, i, 9); data += 13;
+            trellis_encode(output, data, i, 10); data += 13;
+            trellis_encode(output, data, i, 11); data += 13;
         }
     }
 
@@ -117,7 +118,7 @@ private:
     }
 
     // Input is 13 bytes, output is 52 bytes
-    void trellis_encode(atsc_symbol_type* out, uint8_t *data, int round, int encoder) {
+    void trellis_encode(atsc_field_symbol_padded& out, uint8_t *data, int round, int encoder) {
         // The input data is processed in chunks of twelve bytes
         // each byte is fed to a different trellis encoder
         // Each byte is then split up into bit pairs from MSB to LSB (7,6), (5,4), (3,2), (1,0)

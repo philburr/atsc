@@ -9,7 +9,7 @@ void generate_test_data() {
     auto input = random_vector_data<atsc_field_mpeg2>();
     auto output = std::make_unique<atsc_field_data>();
 
-    randomize.randomize_pkts(output->data(), input->data());
+    randomize.randomize_pkts(*output, *input);
 
     save_vector_data("randomize_input.data", input.get());
     save_vector_data("randomize_output.data", output.get());
@@ -24,7 +24,7 @@ TEST_CASE("ATSC Randomize", "[randomize]") {
     auto output = load_vector_data<atsc_field_data>("randomize_output.data");
     auto test = std::make_unique<atsc_field_data>();
 
-    randomize.randomize_pkts(test->data(), input->data());
+    randomize.randomize_pkts(*test, *input);
 
     for (size_t i = 0; i < output->size(); i++) {
         REQUIRE((*output)[i] == (*test)[i]);

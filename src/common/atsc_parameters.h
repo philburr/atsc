@@ -21,7 +21,9 @@ using atsc_field_mpeg2 = std::array<uint8_t, ATSC_DATA_SEGMENTS * ATSC_MPEG2_BYT
 using atsc_field_data = std::array<uint8_t, ATSC_DATA_PER_FIELD>;
 
 using atsc_symbol_type = std::complex<float>;
-using atsc_field_signal = std::array<atsc_symbol_type, ATSC_SYMBOLS_PER_FIELD>;
+using atsc_field_symbol = std::array<atsc_symbol_type, ATSC_SYMBOLS_PER_FIELD>;
+using atsc_field_symbol_padded = std::array<atsc_symbol_type, ATSC_SYMBOLS_PER_FIELD + ATSC_SYMBOLS_PER_SEGMENT>;
+using atsc_reserved_symbols = std::array<atsc_symbol_type, ATSC_RESERVED_SYMBOLS>;
 
 static constexpr unsigned ATSC_TRELLIS_INPUT_SOFTWARE = 13;
 static constexpr unsigned ATSC_TRELLIS_INPUT_OPENCL = ATSC_DATA_PER_FIELD / ATSC_TRELLIS_ENCODERS;

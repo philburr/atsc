@@ -17,15 +17,15 @@ TEST_CASE("ATSC Reed Solomon", "[rs_encode]") {
     auto valid_data = atsc_field_data();
     memcpy(valid_data.data(), data.data(), valid_data.size());
     auto rs_encode = atsc_reed_solomon();
-    rs_encode.process_field(valid_data.data());
+    rs_encode.process_field(valid_data);
 
-    auto input = atsc.cl_alloc(data.size());
-    auto output = atsc.cl_alloc(data.size());
+    auto input = atsc.cl_alloc_arr<atsc_field_data>();
+    auto output = atsc.cl_alloc_arr<atsc_field_data>();
     auto final = atsc_field_data();
 
-    atsc.to_device(input, data.data(), data.size());
+    atsc.to_device(input.data(), data.data(), data.size());
     auto event = atsc.rs_encode(input);
-    atsc.to_host(final.data(), input, data.size(), event);
+    atsc.to_host(final.data(), input.data(), data.size(), event);
 
     for (size_t i = 0; i < final.size(); i++) {
         REQUIRE(final[i] == valid_data[i]);

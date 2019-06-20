@@ -8,10 +8,11 @@
 struct atsc_trellis_cl : virtual opencl_base {
 
 tprotected:
-    cl_event trellis(cl_mem output, cl_mem input, cl_event event = nullptr)
+    cl_event trellis(cl_array<atsc_symbol_type, ATSC_SYMBOLS_PER_FIELD + ATSC_SYMBOLS_PER_SEGMENT> output, 
+                     cl_array<uint8_t, ATSC_DATA_PER_FIELD> input, cl_event event = nullptr)
     {
         gpuErrchk(clSetKernelArg(_trellis_sort_bits, 0, sizeof(cl_mem), &_trellis_bits));
-        gpuErrchk(clSetKernelArg(_trellis_sort_bits, 1, sizeof(cl_mem), &input));
+        gpuErrchk(clSetKernelArg(_trellis_sort_bits, 1, sizeof(cl_mem), &input.data()));
         size_t work[] = { rounded_input_per_trellis/sizeof(uint32_t), ATSC_TRELLIS_ENCODERS, differential_encoders };
         event = start_kernel(_trellis_sort_bits, 3, &work[0], event);
 
@@ -37,7 +38,7 @@ tprotected:
         size_t diff_work[] = { trellis_popcount_size, ATSC_TRELLIS_ENCODERS, differential_encoders - 1 };
         event = start_kernel(_trellis, 3, &diff_work[0], event);
 
-        gpuErrchk(clSetKernelArg(_trellis_encode_signal, 0, sizeof(cl_mem), &output));
+        gpuErrchk(clSetKernelArg(_trellis_encode_signal, 0, sizeof(cl_mem), &output.data()));
         gpuErrchk(clSetKernelArg(_trellis_encode_signal, 1, sizeof(cl_mem), &_trellis_bits));
         gpuErrchk(clSetKernelArg(_trellis_encode_signal, 2, sizeof(cl_mem), &_trellis_popcount1));
         gpuErrchk(clSetKernelArg(_trellis_encode_signal, 3, sizeof(cl_mem), &_output_commutator_table));

@@ -8,13 +8,13 @@ class atsc_interleaver {
 public:
     constexpr atsc_interleaver() {}
 
-    void process(uint8_t* current_field, uint8_t* next_field, uint8_t* input) {
-        uint8_t* fields[2] = {current_field, next_field};
+    void process(atsc_field_data& current_field, atsc_field_data& next_field, atsc_field_data& input) {
+        atsc_field_data* fields[2] = {&current_field, &next_field};
         for (size_t i = 0; i < ATSC_SEGMENT_FEC_BYTES * ATSC_DATA_SEGMENTS; i++) {
             auto destination = table_[i];
             auto field = destination >> 16;
             auto position = destination & 65535;
-            fields[field][position] = *input++;
+            (*fields[field])[position] = input[i];
         }
     }
 

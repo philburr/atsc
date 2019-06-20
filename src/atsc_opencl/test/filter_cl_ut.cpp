@@ -11,33 +11,31 @@ void test_rrc_filter(long unsigned int seed) {
     auto eng = std::mt19937{seed};
     auto rnd = std::uniform_real_distribution<float>(-1, 1); 
 
-    using signal = std::vector<atsc_symbol_type>;
-
-    auto field = signal(ATSC_SYMBOLS_PER_FIELD + ATSC_SYMBOLS_PER_SEGMENT);
-    for (size_t i = 0; i < field.size(); i++) {
-        field[i] = atsc_symbol_type(rnd(eng), rnd(eng));
+    auto field = std::make_unique<atsc_field_symbol_padded>();
+    for (size_t i = 0; i < field->size(); i++) {
+        (*field)[i] = atsc_symbol_type(rnd(eng), rnd(eng));
     }
 
     // Device
-    auto device_field = signal(ATSC_SYMBOLS_PER_FIELD + ATSC_SYMBOLS_PER_SEGMENT);
-    auto input = atsc.cl_alloc(field.size() * sizeof(field[0]));
-    atsc.to_device(input, field.data(), field.size() * sizeof(field[0]));
-    auto output = atsc.cl_alloc(field.size() * sizeof(field[0]));
+    auto device_field = std::make_unique<atsc_field_symbol>();
+    auto input = atsc.cl_alloc_arr<atsc_field_symbol_padded>();
+    atsc.to_device(input.data(), field->data(), field->size() * sizeof((*field)[0]));
+    auto output = atsc.cl_alloc_arr<atsc_field_symbol>();
     auto event = atsc.filter(output, input);
-    atsc.to_host(device_field.data(), output, device_field.size() * sizeof(device_field[0]), event);
+    atsc.to_host(device_field->data(), output.data(), device_field->size() * sizeof((*device_field)[0]), event);
     atsc.cl_free(input);
     atsc.cl_free(output);
 
     // Host
-    auto host_field = signal(ATSC_SYMBOLS_PER_FIELD + ATSC_SYMBOLS_PER_SEGMENT);
+    auto host_field = std::make_unique<atsc_field_symbol>();
     auto host_filter = atsc_rrc_filter();
-    host_filter.process_field(host_field.data(), field.data());
+    host_filter.process_field(*host_field, *field);
 
     #define EPSILON 0.000001f
     #define IS_CLOSE(a, b) (fabsf((a) - (b)) < EPSILON)
     #define IS_CLOSE_CPLX(a, b) (IS_CLOSE(a.real(), b.real()) && IS_CLOSE(a.imag(), b.imag()))
     for (size_t i = 0; i < ATSC_SYMBOLS_PER_FIELD; i++) {
-        REQUIRE(IS_CLOSE_CPLX(host_field[i], device_field[i]));
+        REQUIRE(IS_CLOSE_CPLX((*host_field)[i], (*device_field)[i]));
     }
 }
 

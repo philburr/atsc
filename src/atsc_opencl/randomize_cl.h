@@ -6,11 +6,11 @@
 struct atsc_randomize_cl : virtual opencl_base {
 
 tprotected:
-    cl_event randomize(cl_mem out, cl_mem in, cl_event event = nullptr)
+    cl_event randomize(cl_array<uint8_t, ATSC_DATA_PER_FIELD> out, cl_array<uint8_t, ATSC_DATA_SEGMENTS * ATSC_MPEG2_BYTES> in, cl_event event = nullptr)
     {
         size_t count = ATSC_DATA_PER_FIELD;
-        gpuErrchk(clSetKernelArg(_randomize, 0, sizeof(cl_mem), &out));
-        gpuErrchk(clSetKernelArg(_randomize, 1, sizeof(cl_mem), &in));
+        gpuErrchk(clSetKernelArg(_randomize, 0, sizeof(cl_mem), &out.data()));
+        gpuErrchk(clSetKernelArg(_randomize, 1, sizeof(cl_mem), &in.data()));
         gpuErrchk(clSetKernelArg(_randomize, 2, sizeof(cl_mem), &_random));
         return start_kernel(_randomize, 1, &count, event);
     }

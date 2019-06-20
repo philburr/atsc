@@ -13,7 +13,7 @@ void generate_test_data() {
     }
     save_vector_data("reed_solomon_input.data", input.get());
 
-    rs.process_field(input->data());
+    rs.process_field(*input);
 
     save_vector_data("reed_solomon_output.data", input.get());
 }
@@ -25,7 +25,7 @@ TEST_CASE("ATSC Reed Solomon", "[rs_encode]") {
     auto input = load_vector_data<atsc_field_data>("reed_solomon_input.data");
     auto output = load_vector_data<atsc_field_data>("reed_solomon_output.data");
 
-    rs.process_field(input->data());
+    rs.process_field(*input);
     for (size_t i = 0; i < input->size(); i++) {
         REQUIRE((*input)[i] == (*output)[i]);
     }

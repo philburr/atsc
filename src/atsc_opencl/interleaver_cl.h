@@ -6,12 +6,12 @@
 struct atsc_interleaver_cl : virtual opencl_base {
 
 tprotected:
-    cl_event interleave(cl_mem frame1, cl_mem frame2, cl_mem input, cl_event event = nullptr)
+    cl_event interleave(cl_array<uint8_t, ATSC_DATA_PER_FIELD> frame1, cl_array<uint8_t, ATSC_DATA_PER_FIELD> frame2, cl_array<uint8_t, ATSC_DATA_PER_FIELD> input, cl_event event = nullptr)
     {
         size_t count = ATSC_DATA_PER_FIELD;
-        gpuErrchk(clSetKernelArg(_interleave, 0, sizeof(cl_mem), &frame1));
-        gpuErrchk(clSetKernelArg(_interleave, 1, sizeof(cl_mem), &frame2));
-        gpuErrchk(clSetKernelArg(_interleave, 2, sizeof(cl_mem), &input));
+        gpuErrchk(clSetKernelArg(_interleave, 0, sizeof(cl_mem), &frame1.data()));
+        gpuErrchk(clSetKernelArg(_interleave, 1, sizeof(cl_mem), &frame2.data()));
+        gpuErrchk(clSetKernelArg(_interleave, 2, sizeof(cl_mem), &input.data()));
         gpuErrchk(clSetKernelArg(_interleave, 3, sizeof(cl_mem), &_interleave_table));
         return start_kernel(_interleave, 1, &count, event);
     }

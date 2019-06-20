@@ -6,12 +6,12 @@
 
 void generate_test_data() {
     atsc_rrc_filter filter;
-    using atsc_field_signal_padded = std::array<atsc_symbol_type, ATSC_SYMBOLS_PER_FIELD + ATSC_SYMBOLS_PER_SEGMENT>;
+    using atsc_field_symbol_padded = std::array<atsc_symbol_type, ATSC_SYMBOLS_PER_FIELD + ATSC_SYMBOLS_PER_SEGMENT>;
 
-    auto input = random_vector_data<aligned<atsc_field_signal_padded>>();
-    auto output = std::make_unique<aligned<atsc_field_signal_padded>>();
+    auto input = random_vector_data<aligned<atsc_field_symbol_padded>>();
+    auto output = std::make_unique<aligned<atsc_field_symbol>>();
 
-    filter.process_field(output->data(), input->data());
+    filter.process_field(*output, *input);
 
     save_vector_data("filter_input.data", input.get());
     save_vector_data("filter_output.data", output.get());
@@ -19,13 +19,13 @@ void generate_test_data() {
 
 TEST_CASE("ATSC Filter", "[filter]") {
     atsc_rrc_filter filter;
-    using atsc_field_signal_padded = std::array<atsc_symbol_type, ATSC_SYMBOLS_PER_FIELD + ATSC_SYMBOLS_PER_SEGMENT>;
+    using atsc_field_symbol_padded = std::array<atsc_symbol_type, ATSC_SYMBOLS_PER_FIELD + ATSC_SYMBOLS_PER_SEGMENT>;
 
-    auto input = load_vector_data<aligned<atsc_field_signal_padded>>("filter_input.data");
-    auto output = load_vector_data<atsc_field_signal_padded>("filter_output.data");
-    auto test = std::make_unique<aligned<atsc_field_signal_padded>>();
+    auto input = load_vector_data<aligned<atsc_field_symbol_padded>>("filter_input.data");
+    auto output = load_vector_data<atsc_field_symbol>("filter_output.data");
+    auto test = std::make_unique<aligned<atsc_field_symbol>>();
 
-    filter.process_field(test->data(), input->data());
+    filter.process_field(*test, *input);
 
     #define EPSILON 0.000001f
     #define IS_CLOSE(a, b) (fabsf((a) - (b)) < EPSILON)

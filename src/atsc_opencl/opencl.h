@@ -3,6 +3,7 @@
 #define CL_TARGET_OPENCL_VERSION 220
 #include <CL/cl.hpp>
 #include <vector>
+#include <array>
 
 #ifdef BUILD_UNITTEST
 #define tprivate public
@@ -21,6 +22,23 @@ static inline void gpuAssert(cl_int code, const char *file, int line, bool abort
         if (abort) exit(code);
     }
 }
+
+template<typename T, size_t N>
+struct cl_array {
+    using type = T;
+
+    explicit cl_array(cl_mem mem) : mem_(mem) {}
+
+    constexpr size_t size() {
+        return N;
+    }
+    cl_mem& data() {
+        return mem_;
+    }
+
+private:
+    cl_mem mem_;
+};
 
 struct opencl_base {
 protected:
@@ -130,6 +148,17 @@ tprotected:
         }
     }
 
+    template<typename T, size_t SZ>
+    cl_array<T, SZ> cl_alloc_arr() {
+        return cl_array<T, SZ>(cl_alloc(sizeof(T) * SZ));
+    }
+
+    template<typename T>
+    auto cl_alloc_arr() {
+        using type = std::tuple_element_t<0, T>;
+        return cl_array<type, std::tuple_size<T>::value>(cl_alloc(sizeof(type) * std::tuple_size<T>::value));
+    }
+
     cl_mem cl_alloc(size_t sz) {
         int err;
         cl_mem mem = clCreateBuffer(ctx, CL_MEM_READ_WRITE, sz, NULL, &err); gpuErrchk(err);
@@ -144,6 +173,11 @@ tprotected:
 
     void cl_free(cl_mem mem) {
         clReleaseMemObject(mem);
+    }
+
+    template<typename T, size_t SZ>
+    void cl_free(cl_array<T, SZ> mem) {
+        return cl_free(mem.data());
     }
 
     void cl_memset(cl_mem mem, size_t sz) {

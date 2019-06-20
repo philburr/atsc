@@ -9,25 +9,25 @@ struct atsc_field_sync {
 
     atsc_field_sync() : current_sync(&field_sync_even), next_sync(&field_sync_odd) {}
 
-    void process_field(atsc_symbol_type* field, atsc_symbol_type* saved_symbols) {
+    void process_field(atsc_field_symbol_padded& field, atsc_reserved_symbols& saved_symbols) {
         const field_sync_array& field_sync = *current_sync;
 
-        memcpy(field, field_sync.data(), field_sync.size() * sizeof(atsc_symbol_type));
-        memcpy(field + ATSC_SYMBOLS_PER_SEGMENT - ATSC_RESERVED_SYMBOLS, saved_symbols, ATSC_RESERVED_SYMBOLS * sizeof(atsc_symbol_type));
+        memcpy(field.data(), field_sync.data(), field_sync.size() * sizeof(atsc_symbol_type));
+        memcpy(field.data() + ATSC_SYMBOLS_PER_SEGMENT - ATSC_RESERVED_SYMBOLS, saved_symbols.data(), ATSC_RESERVED_SYMBOLS * sizeof(atsc_symbol_type));
 
         for (size_t i = ATSC_SYMBOLS_PER_SEGMENT; i < ATSC_SYMBOLS_PER_FIELD; i += ATSC_SYMBOLS_PER_SEGMENT) {
-            memcpy(field + i, segment_sync.data(), segment_sync.size() * sizeof(atsc_symbol_type));
+            memcpy(field.data() + i, segment_sync.data(), segment_sync.size() * sizeof(atsc_symbol_type));
         }
 
-        memcpy(saved_symbols, field + ATSC_SYMBOLS_PER_FIELD - ATSC_RESERVED_SYMBOLS, ATSC_RESERVED_SYMBOLS * sizeof(atsc_symbol_type));
+        memcpy(saved_symbols.data(), field.data() + ATSC_SYMBOLS_PER_FIELD - ATSC_RESERVED_SYMBOLS, ATSC_RESERVED_SYMBOLS * sizeof(atsc_symbol_type));
 
         std::swap(current_sync, next_sync);
     }
 
-    void process_segment(atsc_symbol_type* field) {
+    void process_segment(atsc_field_symbol_padded field) {
         const field_sync_array& field_sync = *current_sync;
 
-        memcpy(field, field_sync.data(), field_sync.size() * sizeof(atsc_symbol_type));
+        memcpy(field.data() + ATSC_SYMBOLS_PER_FIELD, field_sync.data(), field_sync.size() * sizeof(atsc_symbol_type));
     }
 
 private:

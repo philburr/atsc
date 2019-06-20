@@ -7,10 +7,10 @@
 void generate_test_data() {
     atsc_offset tuner;
 
-    auto data = random_vector_data<aligned<atsc_field_signal>>();
+    auto data = random_vector_data<aligned<atsc_field_symbol_padded>>();
     save_vector_data("tuner_input.data", data.get());
 
-    tuner.process_field(data->data());
+    tuner.process_field(*data);
 
     save_vector_data("tuner_output.data", data.get());
 }
@@ -18,10 +18,10 @@ void generate_test_data() {
 TEST_CASE("ATSC Tuner", "[tuner]") {
     atsc_offset tuner;
 
-    auto data = load_vector_data<aligned<atsc_field_signal>>("tuner_input.data");
-    auto valid = load_vector_data<atsc_field_signal>("tuner_output.data");
+    auto data = load_vector_data<aligned<atsc_field_symbol_padded>>("tuner_input.data");
+    auto valid = load_vector_data<atsc_field_symbol>("tuner_output.data");
 
-    tuner.process_field(data->data());
+    tuner.process_field(*data);
 
     #define EPSILON 0.000001f
     #define IS_CLOSE(a, b) (fabsf((a) - (b)) < EPSILON)

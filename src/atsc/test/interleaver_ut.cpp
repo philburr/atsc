@@ -12,7 +12,7 @@ void generate_test_data() {
     memset(output1->data(), 0, sizeof((*output1)[0]) * output1->size());
     memset(output2->data(), 0, sizeof((*output2)[0]) * output2->size());
 
-    interleave.process(output1->data(), output2->data(), input->data());
+    interleave.process(*output1, *output2, *input);
 
     save_vector_data("interleaver_input.data", input.get());
     save_vector_data("interleaver_output1.data", output1.get());
@@ -32,7 +32,7 @@ TEST_CASE("ATSC Interleaver", "[interleave]") {
     memset(test2->data(), 0, sizeof((*test2)[0]) * test2->size());
     
 
-    interleave.process(test1->data(), test2->data(), input->data());
+    interleave.process(*test1, *test2, *input);
 
     for (size_t i = 0; i < output1->size(); i++) {
         REQUIRE((*output1)[i] == (*test1)[i]);

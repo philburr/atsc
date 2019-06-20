@@ -7,8 +7,8 @@ void generate_test_data() {
     atsc_field_sync<void> field_sync;
 
     // test even/odd fields
-    auto input1 = random_vector_data<atsc_field_signal>();
-    auto input2 = random_vector_data<atsc_field_signal>();
+    auto input1 = random_vector_data<atsc_field_symbol_padded>();
+    auto input2 = random_vector_data<atsc_field_symbol_padded>();
     for (size_t i = 0; i < ATSC_SYMBOLS_PER_SEGMENT; i++) {
         (*input1)[i] = atsc_symbol_type();
         (*input2)[i] = atsc_symbol_type();
@@ -26,8 +26,15 @@ void generate_test_data() {
     save_vector_data("field_sync_input1.data", input1.get());
     save_vector_data("field_sync_input2.data", input2.get());
 
-    field_sync.process_field(input1->data(), input2->data());
-    field_sync.process_field(input2->data(), input1->data());
+    atsc_reserved_symbols res1;
+    atsc_reserved_symbols res2;
+    for (size_t i = 0; i < res1.size(); i++) {
+        res1[i] = 0x55;
+        res2[i] = 0xaa;
+    }
+
+    field_sync.process_field(*input1, res1);
+    field_sync.process_field(*input2, res2);
 
     save_vector_data("field_sync_output1.data", input1.get());
     save_vector_data("field_sync_output2.data", input2.get());    
@@ -37,13 +44,20 @@ TEST_CASE("ATSC Field Sync", "[field_sync]") {
     atsc_field_sync<void> field_sync;
 
     // test even/odd fields
-    auto input1 = load_vector_data<atsc_field_signal>("field_sync_input1.data");
-    auto input2 = load_vector_data<atsc_field_signal>("field_sync_input2.data");
-    auto output1 = load_vector_data<atsc_field_signal>("field_sync_output1.data");
-    auto output2 = load_vector_data<atsc_field_signal>("field_sync_output2.data");
+    auto input1 = load_vector_data<atsc_field_symbol_padded>("field_sync_input1.data");
+    auto input2 = load_vector_data<atsc_field_symbol_padded>("field_sync_input2.data");
+    auto output1 = load_vector_data<atsc_field_symbol_padded>("field_sync_output1.data");
+    auto output2 = load_vector_data<atsc_field_symbol_padded>("field_sync_output2.data");
 
-    field_sync.process_field(input1->data(), input2->data());
-    field_sync.process_field(input2->data(), input1->data());
+    atsc_reserved_symbols res1;
+    atsc_reserved_symbols res2;
+    for (size_t i = 0; i < res1.size(); i++) {
+        res1[i] = 0x55;
+        res2[i] = 0xaa;
+    }
+
+    field_sync.process_field(*input1, res1);
+    field_sync.process_field(*input2, res2);
 
     #define EPSILON 0.000001f
     #define IS_CLOSE(a, b) (fabsf((a) - (b)) < EPSILON)

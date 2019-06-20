@@ -65,10 +65,10 @@ TEST_CASE("ATSC Interleaver", "[interleaver,opencl]") {
 
     auto interleaver = atsc_interleaver<false>();
     auto ref_table = interleaver.table_.data(); (void)ref_table;
-    interleaver.process(valid_frame1.data(), valid_frame2.data(), data.data());
+    interleaver.process(valid_frame1, valid_frame2, data);
 
-    auto input = atsc.cl_alloc(data.size());
-    atsc.to_device(input, data.data(), data.size());
+    auto input = atsc.cl_alloc_arr<atsc_field_data>();
+    atsc.to_device(input.data(), data.data(), data.size());
     auto new_table = atsc._interleaver_table.table.data(); (void)new_table;
 
     auto output_frame1 = atsc_field_data();
@@ -76,13 +76,13 @@ TEST_CASE("ATSC Interleaver", "[interleaver,opencl]") {
     memset(output_frame1.data(), 0, output_frame1.size());
     memset(output_frame2.data(), 0, output_frame2.size());
 
-    auto output1 = atsc.cl_alloc(output_frame1.size());
-    auto output2 = atsc.cl_alloc(output_frame2.size());
-    atsc.to_device(output1, output_frame1.data(), output_frame1.size());
-    atsc.to_device(output2, output_frame2.data(), output_frame2.size());
+    auto output1 = atsc.cl_alloc_arr<atsc_field_data>();
+    auto output2 = atsc.cl_alloc_arr<atsc_field_data>();
+    atsc.to_device(output1.data(), output_frame1.data(), output_frame1.size());
+    atsc.to_device(output2.data(), output_frame2.data(), output_frame2.size());
     auto event = atsc.interleave(output1, output2, input);
-    atsc.to_host(output_frame1.data(), output1, output_frame1.size(), event);
-    atsc.to_host(output_frame2.data(), output2, output_frame1.size());
+    atsc.to_host(output_frame1.data(), output1.data(), output_frame1.size(), event);
+    atsc.to_host(output_frame2.data(), output2.data(), output_frame1.size());
 
     for (size_t i = 0; i < valid_frame1.size(); i++) {
         REQUIRE(output_frame1[i] == valid_frame1[i]);

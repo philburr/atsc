@@ -8,10 +8,10 @@ struct atsc_offset {
 
     atsc_offset() : _table(std::make_unique<aligned_array<std::complex<float>, ATSC_SYMBOLS_PER_FIELD>>(table)) {}
 
-    void process_field(std::complex<float>* field) {
+    void process_field(atsc_field_symbol_padded& field) {
         unsigned items = ATSC_SYMBOLS_PER_FIELD / 4;
 
-        std::complex<float> *a = field;
+        std::complex<float> *a = field.data();
         std::complex<float> *b = _table->data();
         std::complex<float> *s = scale.data();
 

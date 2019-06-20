@@ -227,16 +227,16 @@ struct atsc_reed_solomon {
 
     using fec = reed_solomon<8, 0x11d, 20>;
 
-    void process_field(uint8_t* buffer) {
+    void process_field(atsc_field_data& buffer) {
         uint8_t padding[40];
         memset(padding, 0, sizeof(padding));
 
         for (size_t dseg = 0; dseg < ATSC_DATA_SEGMENTS; dseg++) {
 
-            uint8_t* bb = buffer + ATSC_SEGMENT_FEC_BYTES * dseg + ATSC_SEGMENT_BYTES;
+            uint8_t* bb = buffer.data() + ATSC_SEGMENT_FEC_BYTES * dseg + ATSC_SEGMENT_BYTES;
             rs_.encode_rs((fec::gf*)bb, (fec::gf*)padding, 40);
 
-            uint8_t* curr = buffer + ATSC_SEGMENT_FEC_BYTES * dseg;
+            uint8_t* curr = buffer.data() + ATSC_SEGMENT_FEC_BYTES * dseg;
             rs_.encode_rs((fec::gf*)bb, (fec::gf*)curr, ATSC_SEGMENT_BYTES);
         }
     }

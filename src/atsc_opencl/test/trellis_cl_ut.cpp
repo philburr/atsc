@@ -28,18 +28,18 @@ TEST_CASE("ATSC Trellis OpenCL", "[trellis,opencl]") {
             atsc_data[index] = i;
     }
 
-    auto valid_data = atsc_field_signal();
+    auto valid_data = atsc_field_symbol_padded();
 
     auto trellis = atsc_trellis_encoder();
-    trellis.process(valid_data.data(), atsc_data.data());
+    trellis.process(valid_data, atsc_data);
 
-    auto input = atsc.cl_alloc(data.size());
-    atsc.to_device(input, data.data(), data.size());
+    auto input = atsc.cl_alloc_arr<atsc_field_data>();
+    atsc.to_device(input.data(), data.data(), data.size());
 
-    auto output_data = atsc_field_signal();
-    auto output = atsc.cl_alloc(output_data.size() * sizeof(atsc_symbol_type));
+    auto output_data = atsc_field_symbol();
+    auto output = atsc.cl_alloc_arr<atsc_field_symbol_padded>();
     cl_event event = atsc.trellis(output, input);
-    atsc.to_host(output_data.data(), output, output_data.size() * sizeof(atsc_symbol_type), event);
+    atsc.to_host(output_data.data(), output.data(), output_data.size() * sizeof(atsc_symbol_type), event);
 
     for (size_t i = 0; i < valid_data.size(); i++) {
         REQUIRE(valid_data[i] == output_data[i]);

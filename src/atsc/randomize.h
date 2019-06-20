@@ -40,7 +40,7 @@ public:
         return data ^ table[index];
     }
 
-    void randomize_pkts(uint8_t* output, uint8_t* input) {
+    void randomize_pkts(atsc_field_data& output, atsc_field_mpeg2& input) {
         unsigned rindex = 0;
         unsigned oindex = 0;
         for (unsigned packet = 0; packet < ATSC_DATA_SEGMENTS; packet++) {

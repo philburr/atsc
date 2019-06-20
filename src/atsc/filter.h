@@ -6,7 +6,7 @@
 
 struct atsc_rrc_filter {
 
-    void process_field(std::complex<float>* out, std::complex<float>* in) {
+    void process_field(atsc_field_symbol& out, atsc_field_symbol_padded& in) {
         for (unsigned i = 0; i < ATSC_SYMBOLS_PER_FIELD; i++) {
             filter(&out[i], &in[i]);
         }

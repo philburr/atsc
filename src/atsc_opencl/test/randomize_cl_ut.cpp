@@ -13,15 +13,15 @@ TEST_CASE("ATSC Randomize", "[randomize]") {
     // Use atsc_randomizer to generate validation data
     auto valid_data = atsc_field_data();
     auto randomizer = atsc_randomize<void>();
-    randomizer.randomize_pkts(valid_data.data(), data.data());
+    randomizer.randomize_pkts(valid_data, data);
 
-    auto input = atsc.cl_alloc(data.size());
-    auto output = atsc.cl_alloc(valid_data.size());
+    auto input = atsc.cl_alloc_arr<atsc_field_mpeg2>();
+    auto output = atsc.cl_alloc_arr<atsc_field_data>();
     auto final = atsc_field_data();
 
-    atsc.to_device(input, data.data(), data.size());
+    atsc.to_device(input.data(), data.data(), data.size());
     auto event = atsc.randomize(output, input);
-    atsc.to_host(final.data(), output, final.size(), event);
+    atsc.to_host(final.data(), output.data(), final.size(), event);
 
     for (size_t i = 0; i < final.size(); i++) {
         REQUIRE(final[i] == valid_data[i]);

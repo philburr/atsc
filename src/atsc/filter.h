@@ -42,10 +42,17 @@ struct atsc_rrc_filter {
             __m256 tap2 = _mm256_permute2f128_ps(tap1lo, tap1hi, 0x20);
             __m256 tap3 = _mm256_permute2f128_ps(tap1lo, tap1hi, 0x31);
 
+#if HAVE_FMA
             val0 = _mm256_fmadd_ps(in0, tap0, val0);
             val1 = _mm256_fmadd_ps(in1, tap1, val1);
             val2 = _mm256_fmadd_ps(in2, tap2, val2);
             val3 = _mm256_fmadd_ps(in3, tap3, val3);
+#else
+            val0 = _mm256_add_ps(_mm256_mul_ps(in0, tap0), val0);
+            val1 = _mm256_add_ps(_mm256_mul_ps(in1, tap1), val1);
+            val2 = _mm256_add_ps(_mm256_mul_ps(in2, tap2), val2);
+            val3 = _mm256_add_ps(_mm256_mul_ps(in3, tap3), val3);
+#endif
 
             in_ptr += 32;
             tap_ptr += 16;

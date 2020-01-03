@@ -271,10 +271,6 @@ private:
                     r_z0b = ((r_z0b << 30) | r_z0b) & 0x0000000300000003;
                     r_z0b = ((r_z0b << 15) | r_z0b) & 0x0001000100010001;
             results = r_z2 | r_z1 | r_z0a | r_z0b;
-            assert(results == (_pdep_u64(z2,  0x0404040404040404ULL) |
-                  _pdep_u64(z1,  0x0202020202020202ULL) |
-                  _pdep_u64(z0a, 0x0100010001000100ULL) |
-                  _pdep_u64(z0b, 0x0001000100010001ULL)));
         }
 #endif
         out[output_table[start +  0]] = xformer::xform(BYTE0(results));
@@ -312,10 +308,6 @@ private:
                     r_z0b = ((r_z0b << 30) | r_z0b) & 0x0000000300000003;
                     r_z0b = ((r_z0b << 15) | r_z0b) & 0x0001000100010001;
             results = r_z2 | r_z1 | r_z0a | r_z0b;
-            assert(results == (_pdep_u64(z2,  0x0404040404040404ULL) |
-                  _pdep_u64(z1,  0x0202020202020202ULL) |
-                  _pdep_u64(z0a, 0x0100010001000100ULL) |
-                  _pdep_u64(z0b, 0x0001000100010001ULL)));
         }
 #endif
         out[output_table[start +  8]] = xformer::xform(BYTE0(results));
@@ -353,10 +345,6 @@ private:
                     r_z0b = ((r_z0b << 30) | r_z0b) & 0x0000000300000003;
                     r_z0b = ((r_z0b << 15) | r_z0b) & 0x0001000100010001;
             results = r_z2 | r_z1 | r_z0a | r_z0b;
-            assert(results == (_pdep_u64(z2,  0x0404040404040404ULL) |
-                  _pdep_u64(z1,  0x0202020202020202ULL) |
-                  _pdep_u64(z0a, 0x0100010001000100ULL) |
-                  _pdep_u64(z0b, 0x0001000100010001ULL)));
         }
 #endif
         out[output_table[start + 16]] = xformer::xform(BYTE0(results));
@@ -394,10 +382,6 @@ private:
                     r_z0b = ((r_z0b << 30) | r_z0b) & 0x0000000300000003;
                     r_z0b = ((r_z0b << 15) | r_z0b) & 0x0001000100010001;
             results = r_z2 | r_z1 | r_z0a | r_z0b;
-            assert(results == (_pdep_u64(z2,  0x0404040404040404ULL) |
-                  _pdep_u64(z1,  0x0202020202020202ULL) |
-                  _pdep_u64(z0a, 0x0100010001000100ULL) |
-                  _pdep_u64(z0b, 0x0001000100010001ULL)));
         }
 #endif
         out[output_table[start + 24]] = xformer::xform(BYTE0(results));
@@ -435,10 +419,6 @@ private:
                     r_z0b = ((r_z0b << 30) | r_z0b) & 0x0000000300000003;
                     r_z0b = ((r_z0b << 15) | r_z0b) & 0x0001000100010001;
             results = r_z2 | r_z1 | r_z0a | r_z0b;
-            assert(results == (_pdep_u64(z2,  0x0404040404040404ULL) |
-                  _pdep_u64(z1,  0x0202020202020202ULL) |
-                  _pdep_u64(z0a, 0x0100010001000100ULL) |
-                  _pdep_u64(z0b, 0x0001000100010001ULL)));
         }
 #endif
         out[output_table[start + 32]] = xformer::xform(BYTE0(results));
@@ -476,10 +456,6 @@ private:
                     r_z0b = ((r_z0b << 30) | r_z0b) & 0x0000000300000003;
                     r_z0b = ((r_z0b << 15) | r_z0b) & 0x0001000100010001;
             results = r_z2 | r_z1 | r_z0a | r_z0b;
-            assert(results == (_pdep_u64(z2,  0x0404040404040404ULL) |
-                  _pdep_u64(z1,  0x0202020202020202ULL) |
-                  _pdep_u64(z0a, 0x0100010001000100ULL) |
-                  _pdep_u64(z0b, 0x0001000100010001ULL)));
         }
 #endif
         out[output_table[start + 40]] = xformer::xform(BYTE0(results));
@@ -513,10 +489,6 @@ private:
             uint32_t r_z0b = (z0b & 0x3);
                     r_z0b = ((r_z0b << 15) | r_z0b) & 0x00010001;
             results = r_z2 | r_z1 | r_z0a | r_z0b;
-            assert(results == (_pdep_u32(z2,  0x04040404) |
-                  _pdep_u32(z1,  0x02020202) |
-                  _pdep_u32(z0a, 0x01000100) |
-                  _pdep_u32(z0b, 0x00010001)));
         }
 #endif
         out[output_table[start + 48]] = xformer::xform(BYTE0(results));

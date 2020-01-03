@@ -7,9 +7,7 @@ target_link_libraries(atsc PRIVATE build_settings PUBLIC Threads::Threads)
 target_compile_options(atsc
 	PRIVATE
 	-fPIC
-	${CXX_BMI2_FLAGS}
-	${CXX_AVX2_FLAGS}
-	${CXX_FMA_FLAGS}
+	${CXX_SSE_FLAGS}
 )
 target_compile_definitions(atsc PRIVATE ${CXX_SSE_DEFINES})
 

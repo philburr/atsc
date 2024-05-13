@@ -19,10 +19,9 @@ add_executable(trellis_ut trellis_ut.cpp)
 target_link_libraries(trellis_ut PRIVATE unittest build_settings)
 target_compile_options(trellis_ut
 	PRIVATE
-	${CXX_BMI2_FLAGS}
-	${CXX_AVX2_FLAGS}
-	${CXX_FMA_FLAGS}
+	${CXX_SSE_FLAGS}
 )
+target_compile_definitions(trellis_ut PRIVATE ${CXX_SSE_DEFINES})
 
 add_executable(field_sync_ut field_sync_ut.cpp)
 target_link_libraries(field_sync_ut PRIVATE unittest build_settings)
@@ -31,19 +30,17 @@ add_executable(tune_ut tune_ut.cpp)
 target_link_libraries(tune_ut PRIVATE unittest build_settings)
 target_compile_options(tune_ut
 	PRIVATE
-	${CXX_BMI2_FLAGS}
-	${CXX_AVX2_FLAGS}
-	${CXX_FMA_FLAGS}
+	${CXX_SSE_FLAGS}
 )
+target_compile_definitions(tune_ut PRIVATE ${CXX_SSE_DEFINES})
 
 add_executable(filter_ut filter_ut.cpp)
 target_link_libraries(filter_ut PRIVATE unittest build_settings)
 target_compile_options(filter_ut
 	PRIVATE
-	${CXX_BMI2_FLAGS}
-	${CXX_AVX2_FLAGS}
-	${CXX_FMA_FLAGS}
+	${CXX_SSE_FLAGS}
 )
+target_compile_definitions(filter_ut PRIVATE ${CXX_SSE_DEFINES})
 
 
 include(CTest)
